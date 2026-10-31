@@ -1,0 +1,300 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum Role {
+  TEACHER
+  PRINCIPAL
+  COUNSELLOR
+  ADMIN
+}
+
+enum AccountStatus {
+  PENDING
+  ACTIVE
+  DEACTIVATED
+  REJECTED
+}
+
+enum CaseStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  CLARIFICATION_REQUIRED
+  ASSIGNED
+  ACTION_PENDING
+  FOLLOW_UP_PENDING
+  CLOSED
+  REOPENED
+  REJECTED
+}
+
+enum ConfidentialityLevel {
+  STANDARD
+  CONFIDENTIAL
+  RESTRICTED
+}
+
+enum ActionStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum FollowUpStatus {
+  PENDING
+  OVERDUE
+  COMPLETED
+  CANCELLED
+}
+
+// Models
+model User {
+  id               String        @id @default(uuid())
+  name             String
+  staffIdentifier  String        @unique
+  email            String        @unique
+  passwordHash     String
+  role             Role
+  accountStatus    AccountStatus @default(PENDING)
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+  approvedAt       DateTime?
+  approvedBy       String?
+  
+  // Relations
+  reportedCases    Case[]       @relation("Reporter")
+  assignedCases    Case[]       @relation("AssignedTo")
+  reviews          CaseReview[]
+  actions          DisciplinaryAction[]
+  interventions    Intervention[]
+  assignedFollowUps FollowUp[]   @relation("AssignedTo")
+  auditEvents      AuditEvent[]
+  exports          ExportLog[]
+  approvedUsers    User[]        @relation("Approver")
+  approver         User?         @relation("Approver", fields: [approvedBy], references: [id])
+  
+  @@index([email])
+  @@index([staffIdentifier])
+  @@index([role, accountStatus])
+}
+
+model Student {
+  id            String   @id @default(uuid())
+  studentId     String   @unique
+  name          String
+  classGrade    String
+  activeStatus  Boolean  @default(true)
+  contactInfo   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  cases         Case[]
+  
+  @@index([studentId])
+  @@index([classGrade])
+  @@index([activeStatus])
+}
+
+model Case {
+  id                    String        @id @default(uuid())
+  referenceNumber       String        @unique
+  studentId             String
+  reporterId            String
+  incidentDate          DateTime
+  incidentTime          DateTime?
+  category              String
+  description           String
+  location              String?
+  witnesses             String?
+  immediateSafetyConcern Boolean       @default(false)
+  status                CaseStatus    @default(SUBMITTED)
+  submittedAt           DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  closedAt              DateTime?
+  closedBy              String?
+  reopenedAt            DateTime?
+  reopenedBy            String?
+  reopenReason          String?
+  version               Int           @default(0)
+  assignedToId          String?
+  assignedAt            DateTime?
+  
+  // Relations
+  student               Student       @relation(fields: [studentId], references: [id])
+  reporter              User          @relation("Reporter", fields: [reporterId], references: [id])
+  assignedTo            User?         @relation("AssignedTo", fields: [assignedToId], references: [id])
+  reviews               CaseReview[]
+  actions               DisciplinaryAction[]
+  interventions          Intervention[]
+  followUps             FollowUp[]
+  
+  @@index([referenceNumber])
+  @@index([studentId])
+  @@index([reporterId])
+  @@index([status])
+  @@index([incidentDate])
+  @@index([submittedAt])
+  @@index([assignedToId])
+}
+
+model CaseReview {
+  id                   String   @id @default(uuid())
+  caseId              String
+  reviewerId           String
+  reviewDate           DateTime @default(now())
+  result               String
+  clarificationRequest String?
+  notes                String?
+  createdAt            DateTime @default(now())
+  
+  // Relations
+  case                 Case     @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  reviewer             User     @relation(fields: [reviewerId], references: [id])
+  
+  @@index([caseId])
+  @@index([reviewerId])
+  @@index([reviewDate])
+}
+
+model DisciplinaryAction {
+  id                String        @id @default(uuid())
+  caseId            String
+  actionType        String
+  rationale         String
+  startDate         DateTime?
+  endDate           DateTime?
+  responsibleUserId String
+  status            ActionStatus  @default(PENDING)
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+  
+  // Relations
+  case              Case         @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  responsibleUser   User         @relation(fields: [responsibleUserId], references: [id])
+  
+  @@index([caseId])
+  @@index([responsibleUserId])
+  @@index([status])
+}
+
+model Intervention {
+  id                  String              @id @default(uuid())
+  caseId              String
+  counsellorId        String
+  type                String
+  date                DateTime
+  notes               String
+  confidentialityLevel ConfidentialityLevel @default(STANDARD)
+  outcome             String?
+  nextStep            String?
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  
+  // Relations
+  case                Case                @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  counsellor          User                @relation(fields: [counsellorId], references: [id])
+  confidentialNotes   ConfidentialNote[]
+  
+  @@index([caseId])
+  @@index([counsellorId])
+  @@index([date])
+  @@index([confidentialityLevel])
+}
+
+model ConfidentialNote {
+  id             String   @id @default(uuid())
+  interventionId  String
+  notes          String
+  createdAt      DateTime @default(now())
+  createdBy      String
+  
+  // Relations
+  intervention    Intervention @relation(fields: [interventionId], references: [id], onDelete: Cascade)
+  
+  @@index([interventionId])
+}
+
+model FollowUp {
+  id              String        @id @default(uuid())
+  caseId          String
+  dueDate         DateTime
+  assignedUserId  String
+  completionDate  DateTime?
+  result          String?
+  nextStep        String?
+  status          FollowUpStatus @default(PENDING)
+  completedBy     String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Relations
+  case            Case         @relation(fields: [caseId], references: [id], onDelete: Cascade)
+  assignedUser    User         @relation("AssignedTo", fields: [assignedUserId], references: [id])
+  
+  @@index([caseId])
+  @@index([assignedUserId])
+  @@index([dueDate])
+  @@index([status])
+}
+
+model AuditEvent {
+  id         String   @id @default(uuid())
+  actorId    String
+  action     String
+  targetType String
+  targetId   String?
+  timestamp  DateTime @default(now())
+  metadata   Json?
+  ipAddress  String?
+  userAgent  String?
+  
+  // Relations
+  actor      User     @relation(fields: [actorId], references: [id])
+  
+  @@index([actorId])
+  @@index([action])
+  @@index([targetType, targetId])
+  @@index([timestamp])
+}
+
+model ExportLog {
+  id          String   @id @default(uuid())
+  userId      String
+  timestamp   DateTime @default(now())
+  filters     Json
+  fields      Json
+  recordCount Int
+  status      String
+  filePath    String?
+  
+  // Relations
+  user        User     @relation(fields: [userId], references: [id])
+  
+  @@index([userId])
+  @@index([timestamp])
+  @@index([status])
+}
+
+model Configuration {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       Json
+  category    String
+  description String?
+  updatedAt   DateTime @updatedAt
+  
+  @@index([key])
+  @@index([category])
+}
