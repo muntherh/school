@@ -1,0 +1,76 @@
+{
+  "app": {
+    "[project]/app/_not-found/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/audit-log/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/cases/[id]/action/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/cases/[id]/follow-up/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/cases/[id]/intervention/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/cases/[id]/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/cases/[id]/reopen/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/cases/[id]/review/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/cases/new/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/cases/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/dashboard/counsellor/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/dashboard/principal/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/dashboard/teacher/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/export/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/login/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/pending-approval/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/settings/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/students/new/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/students/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/unauthorized/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/users/new/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ],
+    "[project]/app/users/page": [
+      "static/media/07c7676b89ed2778-s.p.2bn3s6zvc0dyp.woff2"
+    ]
+  },
+  "appUsingSizeAdjust": true,
+  "pages": {},
+  "pagesUsingSizeAdjust": false
+}
