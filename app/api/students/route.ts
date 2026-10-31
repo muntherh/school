@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { StudentService } from '@/services/student.service'
 import { studentFilterSchema } from '@/lib/validation'
@@ -7,6 +8,8 @@ import { withAuth, authErrorResponse } from '@/lib/middleware'
 // GET /api/students - Search students
 export async function GET(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {
@@ -33,6 +36,8 @@ export async function GET(request: NextRequest) {
 // POST /api/students - Create a new student
 export async function POST(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {

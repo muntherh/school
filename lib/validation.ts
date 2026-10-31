@@ -62,8 +62,8 @@ export const updateStudentSchema = z.object({
 // Case schemas
 export const createCaseSchema = z.object({
   studentId: z.string().uuid('Invalid student ID'),
-  incidentDate: z.string().or(z.date()),
-  incidentTime: z.string().or(z.date()).optional(),
+  incidentDate: z.union([z.string().refine(v => Number.isFinite(Date.parse(v)), 'Invalid date'), z.date()]),
+  incidentTime: z.union([z.string().refine(v => Number.isFinite(Date.parse(v)), 'Invalid date'), z.date()]).optional(),
   category: z.string().min(1, 'Category is required'),
   description: z.string().min(10, 'Description must be at least 10 characters').max(5000),
   location: z.string().max(255).optional(),
@@ -101,8 +101,8 @@ export const respondToClarificationSchema = z.object({
 export const createDisciplinaryActionSchema = z.object({
   actionType: z.string().min(1, 'Action type is required'),
   rationale: z.string().min(10, 'Rationale must be at least 10 characters').max(5000),
-  startDate: z.string().or(z.date()).optional(),
-  endDate: z.string().or(z.date()).optional(),
+  startDate: z.union([z.string().refine(v => Number.isFinite(Date.parse(v)), 'Invalid date'), z.date()]).optional(),
+  endDate: z.union([z.string().refine(v => Number.isFinite(Date.parse(v)), 'Invalid date'), z.date()]).optional(),
   responsibleUserId: z.string().uuid('Invalid user ID'),
 })
 
@@ -113,7 +113,7 @@ export const updateDisciplinaryActionSchema = z.object({
 // Intervention schemas
 export const createInterventionSchema = z.object({
   type: z.string().min(1, 'Type is required'),
-  date: z.string().or(z.date()),
+  date: z.union([z.string().refine(v => Number.isFinite(Date.parse(v)), 'Invalid date'), z.date()]),
   notes: z.string().min(10, 'Notes must be at least 10 characters').max(5000),
   confidentialityLevel: ConfidentialityLevelEnum.optional().default('STANDARD'),
   outcome: z.string().max(2000).optional(),
@@ -122,7 +122,7 @@ export const createInterventionSchema = z.object({
 
 export const updateInterventionSchema = z.object({
   type: z.string().min(1).optional(),
-  date: z.string().or(z.date()).optional(),
+  date: z.union([z.string().refine(v => Number.isFinite(Date.parse(v)), 'Invalid date'), z.date()]).optional(),
   notes: z.string().min(10).max(5000).optional(),
   confidentialityLevel: ConfidentialityLevelEnum.optional(),
   outcome: z.string().max(2000).optional(),
@@ -135,13 +135,13 @@ export const createConfidentialNoteSchema = z.object({
 
 // Follow-up schemas
 export const createFollowUpSchema = z.object({
-  dueDate: z.string().or(z.date()),
+  dueDate: z.union([z.string().refine(v => Number.isFinite(Date.parse(v)), 'Invalid date'), z.date()]),
   assignedUserId: z.string().uuid('Invalid user ID'),
   nextStep: z.string().max(2000).optional(),
 })
 
 export const updateFollowUpSchema = z.object({
-  completionDate: z.string().or(z.date()).optional(),
+  completionDate: z.union([z.string().refine(v => Number.isFinite(Date.parse(v)), 'Invalid date'), z.date()]).optional(),
   result: z.string().max(2000).optional(),
   nextStep: z.string().max(2000).optional(),
   status: FollowUpStatusEnum.optional(),
@@ -156,8 +156,8 @@ export const updateConfigurationSchema = z.object({
 export const exportCasesSchema = z.object({
   filters: z.object({
     status: z.array(CaseStatusEnum).optional(),
-    incidentDateFrom: z.string().or(z.date()).optional(),
-    incidentDateTo: z.string().or(z.date()).optional(),
+    incidentDateFrom: z.union([z.string().refine(v => Number.isFinite(Date.parse(v)), 'Invalid date'), z.date()]).optional(),
+    incidentDateTo: z.union([z.string().refine(v => Number.isFinite(Date.parse(v)), 'Invalid date'), z.date()]).optional(),
     category: z.array(z.string()).optional(),
     studentId: z.string().uuid().optional(),
   }),
@@ -166,14 +166,15 @@ export const exportCasesSchema = z.object({
 
 // Query parameter schemas
 export const caseFilterSchema = z.object({
+  assignedToId: z.string().uuid().optional(),
   status: CaseStatusEnum.optional(),
   studentId: z.string().uuid().optional(),
   reporterId: z.string().uuid().optional(),
   category: z.string().optional(),
   incidentDateFrom: z.string().optional(),
   incidentDateTo: z.string().optional(),
-  page: z.string().optional().default('1'),
-  limit: z.string().optional().default('20'),
+  page: z.string().regex(/^[1-9]\d*$/).optional().default('1'),
+  limit: z.string().regex(/^[1-9]\d*$/).refine(v => Number(v) <= 100).optional().default('20'),
 })
 
 export const studentFilterSchema = z.object({
@@ -190,6 +191,6 @@ export const auditFilterSchema = z.object({
   targetId: z.string().uuid().optional(),
   from: z.string().optional(),
   to: z.string().optional(),
-  page: z.string().optional().default('1'),
+  page: z.string().regex(/^[1-9]\d*$/).optional().default('1'),
   limit: z.string().optional().default('50'),
 })

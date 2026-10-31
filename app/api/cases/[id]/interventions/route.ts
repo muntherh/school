@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { InterventionService } from '@/services/intervention.service'
 import { successResponse, errorResponse } from '@/lib/api-response'
@@ -10,6 +11,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {
@@ -37,6 +40,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {

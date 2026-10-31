@@ -10,7 +10,7 @@ describe('Case Workflow Service', () => {
   let studentId: string
   let caseId: string
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     // Create test users
     const principal = await prisma.user.create({
       data: {
@@ -84,17 +84,6 @@ describe('Case Workflow Service', () => {
     caseId = testCase.id
   })
 
-  afterAll(async () => {
-    // Clean up all test data
-    await prisma.followUp.deleteMany()
-    await prisma.intervention.deleteMany()
-    await prisma.disciplinaryAction.deleteMany()
-    await prisma.caseReview.deleteMany()
-    await prisma.case.deleteMany()
-    await prisma.auditEvent.deleteMany()
-    await prisma.user.deleteMany()
-    await prisma.student.deleteMany()
-  })
 
   describe('Status Transitions', () => {
     it('should allow valid transition from SUBMITTED to UNDER_REVIEW', async () => {

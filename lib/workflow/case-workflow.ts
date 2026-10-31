@@ -81,7 +81,7 @@ export class CaseWorkflowService {
 
     // Perform transition
     const updatedCase = await prisma.case.update({
-      where: { id: caseId },
+      where: { id: caseId, version: currentCase.version },
       data: updateData,
       include: { student: true, reporter: true },
     })

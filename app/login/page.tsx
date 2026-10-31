@@ -123,7 +123,7 @@ export default function LoginPage() {
             <div className="text-center text-xs text-slate-500">
               <p>
                 Need account access?{' '}
-                <a href="mailto:admin@school.edu" className="text-emerald-500 hover:text-emerald-400 font-medium hover:underline transition-colors">
+                <a href={`mailto:${process.env.NEXT_PUBLIC_SUPPORT_EMAIL || 'admin@school.edu'}`} className="text-emerald-500 hover:text-emerald-400 font-medium hover:underline transition-colors">
                   Contact your administrator
                 </a>
               </p>

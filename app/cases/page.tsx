@@ -121,13 +121,13 @@ export default function CasesPage() {
                 <Label>Status</Label>
                 <Select
                   value={filters.status}
-                  onValueChange={(value) => handleFilterChange('status', value)}
+                  onValueChange={(value) => handleFilterChange('status', value === 'all' ? '' : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All Statuses" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Statuses</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="SUBMITTED">Submitted</SelectItem>
                     <SelectItem value="UNDER_REVIEW">Under Review</SelectItem>
                     <SelectItem value="CLARIFICATION_REQUIRED">Clarification Required</SelectItem>
@@ -140,13 +140,13 @@ export default function CasesPage() {
                 <Label>Category</Label>
                 <Select
                   value={filters.category}
-                  onValueChange={(value) => handleFilterChange('category', value)}
+                  onValueChange={(value) => handleFilterChange('category', value === 'all' ? '' : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     <SelectItem value="Behavioral Issue">Behavioral Issue</SelectItem>
                     <SelectItem value="Academic Dishonesty">Academic Dishonesty</SelectItem>
                     <SelectItem value="Attendance Issue">Attendance Issue</SelectItem>

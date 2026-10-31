@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { CaseService } from '@/services/case.service'
 import { successResponse, errorResponse } from '@/lib/api-response'
@@ -7,6 +8,8 @@ import { AuditService } from '@/services/audit.service'
 // GET /api/cases - Get cases with filters
 export async function GET(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {
@@ -15,6 +18,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const filters = {
+      assignedToId: auth.user.role === 'COUNSELLOR' ? auth.user.id : undefined,
       status: searchParams.get('status') || undefined,
       studentId: searchParams.get('studentId') || undefined,
       reporterId: searchParams.get('reporterId') || undefined,
@@ -42,6 +46,8 @@ export async function GET(request: NextRequest) {
 // POST /api/cases - Create a new case
 export async function POST(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {

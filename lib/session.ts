@@ -1,4 +1,5 @@
 import { IronSession, getIronSession } from 'iron-session'
+import { prisma } from './prisma'
 import { cookies } from 'next/headers'
 
 export interface SessionData {
@@ -10,6 +11,8 @@ export interface SessionData {
   isLoggedIn?: boolean
 }
 
+const sessionTTL = Number(process.env.SESSION_MAX_AGE || '28800')
+if (!Number.isInteger(sessionTTL) || sessionTTL < 60 || sessionTTL > 86400) throw new Error('SESSION_MAX_AGE must be between 60 and 86400 seconds')
 export const sessionOptions = {
   password: process.env.SESSION_SECRET || (() => {
     if (process.env.NODE_ENV === 'production') {
@@ -18,12 +21,13 @@ export const sessionOptions = {
     return 'default-secret-change-in-production'
   })(),
   cookieName: 'sdms-session',
+  ttl: sessionTTL,
   cookieOptions: {
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     sameSite: 'lax' as const,
     path: '/',
-    maxAge: parseInt(process.env.SESSION_MAX_AGE || '28800000'), // 8 hours default
+    maxAge: sessionTTL, // 8 hours default
   },
 }
 
@@ -67,9 +71,14 @@ export async function requireSession() {
 export async function requireActiveSession() {
   const session = await requireSession()
   
-  if (session.accountStatus !== 'ACTIVE') {
+  const user = await prisma.user.findUnique({ where: { id: session.userId! } })
+  if (!user || user.accountStatus !== 'ACTIVE') {
     throw new Error('Account not active')
   }
   
+  session.role = user.role
+  session.accountStatus = user.accountStatus
+  session.name = user.name
+  session.email = user.email
   return session
 }

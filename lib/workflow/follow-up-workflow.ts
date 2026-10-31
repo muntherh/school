@@ -1,3 +1,4 @@
+import { createFollowUpSchema } from '@/lib/validation'
 import { prisma } from '@/lib/prisma'
 import { AuditService } from '@/services/audit.service'
 
@@ -21,17 +22,21 @@ export class FollowUpWorkflowService {
    * Create and assign a follow-up
    */
   static async assignFollowUp(input: FollowUpAssignmentInput) {
+    createFollowUpSchema.parse({ ...input, nextStep: input.notes })
+    if (!Number.isFinite(input.dueDate.getTime())) throw new Error('Invalid follow-up date')
+    const assignee = await prisma.user.findUnique({where:{id:input.assignedUserId}})
+    if (!assignee || assignee.accountStatus !== 'ACTIVE' || assignee.role === 'ADMIN') throw new Error('Invalid assignee')
     const followUp = await prisma.followUp.create({
       data: {
         caseId: input.caseId,
         dueDate: input.dueDate,
         assignedUserId: input.assignedUserId,
-        notes: input.notes,
+        nextStep: input.notes,
         status: 'PENDING',
       },
       include: {
         case: true,
-        assignedUser: true,
+        assignedUser: {select:{id:true,name:true}},
       },
     })
 
@@ -95,30 +100,9 @@ export class FollowUpWorkflowService {
       },
       include: {
         case: true,
-        assignedUser: true,
+        assignedUser: {select:{id:true,name:true}},
       },
     })
-
-    // Check if all follow-ups for this case are completed
-    const pendingFollowUps = await prisma.followUp.count({
-      where: {
-        caseId: followUp.caseId,
-        status: 'PENDING',
-      },
-    })
-
-    // If no pending follow-ups, consider closing the case
-    if (pendingFollowUps === 0 && followUp.case.status === 'FOLLOW_UP_PENDING') {
-      await prisma.case.update({
-        where: { id: followUp.caseId },
-        data: {
-          status: 'CLOSED',
-          closedAt: new Date(),
-          closedBy: input.completedBy,
-          version: { increment: 1 },
-        },
-      })
-    }
 
     // Log audit event
     await AuditService.logEvent({
@@ -151,7 +135,7 @@ export class FollowUpWorkflowService {
       },
       include: {
         case: true,
-        assignedUser: true,
+        assignedUser: {select:{id:true,name:true}},
       },
       orderBy: {
         dueDate: 'asc',
@@ -186,7 +170,7 @@ export class FollowUpWorkflowService {
       },
       include: {
         case: true,
-        assignedUser: true,
+        assignedUser: {select:{id:true,name:true}},
       },
       orderBy: {
         dueDate: 'asc',

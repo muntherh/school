@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { successResponse, errorResponse } from '@/lib/api-response'
@@ -5,6 +6,8 @@ import { successResponse, errorResponse } from '@/lib/api-response'
 // GET /api/configuration - Get all configuration
 export async function GET(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
 

@@ -1,3 +1,4 @@
+import { allowLogin } from '@/lib/login-limit'
 import { NextRequest, NextResponse } from 'next/server'
 import { AuthService } from '@/services/auth.service'
 import { loginSchema } from '@/lib/validation'
@@ -10,6 +11,9 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const validatedData = loginSchema.parse(body)
 
+    const origin = request.headers.get('origin')
+    if (origin && origin !== new URL(process.env.NEXT_PUBLIC_APP_URL || request.url).origin) return NextResponse.json({success:false}, {status:403})
+    if (!allowLogin(validatedData.email.toLowerCase())) return NextResponse.json(errorResponse('RATE_LIMIT','Too many attempts. Try again later.'), {status:429})
     const result = await AuthService.login(validatedData.email, validatedData.password)
 
     if (!result.success) {
@@ -41,7 +45,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(successResponse(result.user))
   } catch (error: any) {
     if (error.name === 'ZodError') {
-      return NextResponse.json(errorResponse('VALIDATION_ERROR', 'Invalid input data', error.errors), { status: 400 })
+      return NextResponse.json(errorResponse('VALIDATION_ERROR', 'Invalid input data', error.issues), { status: 400 })
     }
     console.error('Login error:', error)
     return NextResponse.json(errorResponse('INTERNAL_ERROR', 'An error occurred during login'), { status: 500 })

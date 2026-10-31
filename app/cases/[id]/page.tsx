@@ -1,4 +1,5 @@
 'use client'
+import { CompleteFollowUp } from '@/components/complete-follow-up'
 
 import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
@@ -39,28 +40,11 @@ export default function CaseDetailsPage() {
   const loadCaseData = async () => {
     setIsLoading(true)
     try {
-      const [caseResponse, reviewsResponse, actionsResponse, interventionsResponse, followUpsResponse] = await Promise.all([
-        api.getCase(params.id as string),
-        api.getCaseReviews(params.id as string),
-        api.getCaseActions(params.id as string),
-        api.getInterventions(params.id as string),
-        api.getFollowUps(params.id as string),
-      ])
-
-      if (caseResponse.success && caseResponse.data) {
-        setCaseData(caseResponse.data)
-      }
-      if (reviewsResponse.success && reviewsResponse.data) {
-        setReviews(Array.isArray(reviewsResponse.data) ? reviewsResponse.data : [])
-      }
-      if (actionsResponse.success && actionsResponse.data) {
-        setActions(Array.isArray(actionsResponse.data) ? actionsResponse.data : [])
-      }
-      if (interventionsResponse.success && interventionsResponse.data) {
-        setInterventions(Array.isArray(interventionsResponse.data) ? interventionsResponse.data : [])
-      }
-      if (followUpsResponse.success && followUpsResponse.data) {
-        setFollowUps(Array.isArray(followUpsResponse.data) ? followUpsResponse.data : [])
+      const response = await api.getCase(params.id as string)
+      if (response.success && response.data) {
+        const record = response.data as any
+        setCaseData(record); setReviews(record.reviews || []); setActions(record.actions || [])
+        setInterventions(record.interventions || []); setFollowUps(record.followUps || [])
       }
     } catch (error) {
       console.error('Failed to load case data:', error)
@@ -71,7 +55,7 @@ export default function CaseDetailsPage() {
 
   const loadUsers = async () => {
     try {
-      const response = await api.getUsers({ status: 'ACTIVE' })
+      const response = await api.getAssignableUsers()
       if (response.success && response.data) {
         setUsers(Array.isArray(response.data) ? response.data : [])
       }
@@ -411,7 +395,7 @@ export default function CaseDetailsPage() {
                     {actions.map((action) => (
                       <TableRow key={action.id} className="hover:bg-slate-50 transition-colors">
                         <TableCell className="text-slate-900">{action.actionType}</TableCell>
-                        <TableCell className="text-slate-600">{action.description}</TableCell>
+                        <TableCell className="text-slate-600">{action.rationale}</TableCell>
                         <TableCell>
                           <Badge variant={action.status === 'COMPLETED' ? 'success' : 'warning'} className={action.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}>
                             {action.status}
@@ -449,9 +433,9 @@ export default function CaseDetailsPage() {
                     {interventions.map((intervention) => (
                       <TableRow key={intervention.id} className="hover:bg-slate-50 transition-colors">
                         <TableCell className="text-slate-900">{intervention.type}</TableCell>
-                        <TableCell className="text-slate-600">{new Date(intervention.interventionDate).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-slate-600">{new Date(intervention.date).toLocaleDateString()}</TableCell>
                         <TableCell className="text-slate-600">{intervention.notes}</TableCell>
-                        <TableCell className="text-slate-600">{intervention.counsellorName}</TableCell>
+                        <TableCell className="text-slate-600">{intervention.counsellor?.name}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
@@ -485,7 +469,7 @@ export default function CaseDetailsPage() {
                         <TableCell className="text-slate-900">{new Date(followUp.dueDate).toLocaleDateString()}</TableCell>
                         <TableCell>
                           <Badge variant={followUp.status === 'COMPLETED' ? 'success' : 'warning'} className={followUp.status === 'COMPLETED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}>
-                            {followUp.status}
+                            {followUp.status}{['PRINCIPAL','COUNSELLOR'].includes(user?.role||'') && ['PENDING','OVERDUE'].includes(followUp.status) && <CompleteFollowUp id={followUp.id} onComplete={() => window.location.reload()}/>} 
                           </Badge>
                         </TableCell>
                         <TableCell className="text-slate-600">{followUp.notes}</TableCell>

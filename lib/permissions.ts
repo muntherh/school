@@ -141,7 +141,7 @@ export const CASE_STATUS_TRANSITIONS: Record<CaseStatusCode, CaseStatusCode[]> =
  * Check if a user has a specific permission
  */
 export function hasPermission(role: UserRole, permission: keyof typeof ROLE_PERMISSIONS.TEACHER): boolean {
-  return ROLE_PERMISSIONS[role][permission] === true
+  return ROLE_PERMISSIONS[role]?.[permission] === true
 }
 
 /**

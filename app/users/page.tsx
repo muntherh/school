@@ -126,13 +126,13 @@ export default function UsersPage() {
                 <Label>Status</Label>
                 <Select
                   value={filters.status}
-                  onValueChange={(value) => handleFilterChange('status', value)}
+                  onValueChange={(value) => handleFilterChange('status', value === 'all' ? '' : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All Statuses" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Statuses</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="ACTIVE">Active</SelectItem>
                     <SelectItem value="PENDING">Pending</SelectItem>
                     <SelectItem value="DEACTIVATED">Deactivated</SelectItem>
@@ -144,13 +144,13 @@ export default function UsersPage() {
                 <Label>Role</Label>
                 <Select
                   value={filters.role}
-                  onValueChange={(value) => handleFilterChange('role', value)}
+                  onValueChange={(value) => handleFilterChange('role', value === 'all' ? '' : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All Roles" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Roles</SelectItem>
+                    <SelectItem value="all">All Roles</SelectItem>
                     <SelectItem value="PRINCIPAL">Principal</SelectItem>
                     <SelectItem value="TEACHER">Teacher</SelectItem>
                     <SelectItem value="COUNSELLOR">Counsellor</SelectItem>

@@ -78,7 +78,7 @@ export default function ExportPage() {
   ]
 
   const canViewExtended = user?.role === 'PRINCIPAL' || user?.role === 'ADMIN'
-  const canViewConfidential = user?.role === 'PRINCIPAL' || user?.role === 'COUNSELLOR'
+  const canViewConfidential = false
 
   useEffect(() => {
     loadStats()
@@ -91,7 +91,7 @@ export default function ExportPage() {
         if (value) params.append(key, value)
       })
 
-      const response = await fetch(`/api/export/cases/stats?${params.toString()}`, {
+      const response = await fetch(`/api/export/cases?${params.toString()}`, {
         credentials: 'include',
       })
       const data = await response.json()
@@ -111,8 +111,8 @@ export default function ExportPage() {
     )
   }
 
-  const handleExport = async () => {
-    if (!warningAcknowledged) {
+  const handleExport = async (acknowledged = warningAcknowledged) => {
+    if (!acknowledged) {
       setShowWarning(true)
       return
     }
@@ -163,7 +163,7 @@ export default function ExportPage() {
   const handleWarningAcknowledge = () => {
     setWarningAcknowledged(true)
     setShowWarning(false)
-    handleExport()
+    handleExport(true)
   }
 
   if (user?.role !== 'PRINCIPAL' && user?.role !== 'ADMIN') {
@@ -229,7 +229,7 @@ export default function ExportPage() {
                 <div>
                   <p className="text-sm font-medium text-gray-600">Status</p>
                   {stats.requiresPagination ? (
-                    <Badge variant="danger">Exceeds Limit</Badge>
+                    <Badge variant="destructive">Exceeds Limit</Badge>
                   ) : (
                     <Badge variant="success">Within Limit</Badge>
                   )}
@@ -376,7 +376,7 @@ export default function ExportPage() {
  Cancel
           </Button>
           <Button
-            onClick={handleExport}
+            onClick={() => handleExport()}
             isLoading={isExporting}
             disabled={selectedFields.length === 0 || (stats?.requiresPagination)}
           >

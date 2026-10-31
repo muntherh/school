@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { FollowUpService } from '@/services/follow-up.service'
 import { successResponse, errorResponse } from '@/lib/api-response'
@@ -8,6 +9,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const { id } = await params
     const followUp = await FollowUpService.getFollowUpById(id)
 
@@ -28,6 +31,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const { id } = await params
     const body = await request.json()
     const followUp = await FollowUpService.updateFollowUp(id, body)

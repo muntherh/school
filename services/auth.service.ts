@@ -56,7 +56,7 @@ export class AuthService {
 
       // Check if account is active
       if (user.accountStatus !== 'ACTIVE') {
-        return { success: false, error: 'Account is not active' }
+        return { success: false, error: 'Invalid credentials' }
       }
 
       // Verify password

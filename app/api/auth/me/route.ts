@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { successResponse, errorResponse } from '@/lib/api-response'
-import { requireSession } from '@/lib/session'
+import { requireActiveSession } from '@/lib/session'
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await requireSession()
+    const session = await requireActiveSession()
     
     return NextResponse.json(successResponse({
       id: session.userId,

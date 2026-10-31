@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { successResponse, errorResponse } from '@/lib/api-response'
 import { withAuth, authErrorResponse, permissionErrorResponse } from '@/lib/middleware'
@@ -9,6 +10,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {

@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { AuthService } from '@/services/auth.service'
 import { updateUserStatusSchema } from '@/lib/validation'
@@ -11,6 +12,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const { id } = await params
     const auth = await withPermission(request, 'canApproveUser')
     
@@ -45,7 +48,7 @@ export async function PATCH(
     return NextResponse.json(successResponse(user))
   } catch (error: any) {
     if (error.name === 'ZodError') {
-      return NextResponse.json(errorResponse('VALIDATION_ERROR', 'Invalid input data', error.errors), { status: 400 })
+      return NextResponse.json(errorResponse('VALIDATION_ERROR', 'Invalid input data', error.issues), { status: 400 })
     }
     console.error('Update user status error:', error)
     return NextResponse.json(errorResponse('INTERNAL_ERROR', error.message || 'Failed to update user status'), { status: 500 })

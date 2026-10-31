@@ -1,0 +1,685 @@
+SOFTWARE REQUIREMENTS
+SPECIFICATION
+School Disciplinary Management System
+A secure, role-based platform for incident reporting, case management,
+student support interventions, and authorized reporting
+Document Version
+1.0 — Draft for review
+Date
+24 October 2026
+Status
+Proposed requirements; stakeholder validation required
+Prepared For
+School administration and project stakeholders
+CONFIDENTIALITY NOTICE
+This document describes proposed requirements for a system handling sensitive student and staff records. It should be reviewed by authorized school stakeholders and aligned with applicable Ministry of Education requirements, privacy obligations, and school policies before implementation.
+Document Control
+Item
+Details
+Purpose
+Define functional and non-functional requirements for the School Disciplinary Management System (SDMS).
+Intended audience
+School leadership, teachers, counsellors, developers, testers, IT/security staff, and relevant stakeholders.
+Scope of this version
+Proposed baseline requirements based on the initial concept. Workflow, legal, retention, and technical details require confirmation.
+Approval
+To be approved by the school’s authorized representative before development baseline is finalized.
+Revision History
+Version
+Date
+Author
+Description
+1.0
+24 October 2026
+Project team / to be confirmed
+Initial draft based on stakeholder-provided concept.
+Table of Contents
+1. Introduction
+2. Overall Description
+3. User Classes and Permissions
+4. Functional Requirements
+5. Business Rules and Case Workflow
+6. Data Requirements
+7. External Interface Requirements
+8. Non-Functional Requirements
+9. Reporting and CSV Export
+10. Security, Privacy, and Audit
+11. Assumptions, Dependencies, and Constraints
+12. Out of Scope
+13. Acceptance Criteria
+14. Open Questions and Decisions
+Appendix A. Proposed Case Statuses
+Appendix B. Glossary
+1. Introduction
+1.1 Purpose
+This Software Requirements Specification (SRS) defines the proposed requirements for a School Disciplinary Management System (SDMS). The system will provide an authenticated web portal through which authorized school staff can document student-related incidents, review and manage cases, record decisions and support interventions, monitor follow-ups, and export authorized records for administrative or official reporting.
+1.2 Background
+The school needs a consistent, searchable, and auditable method of documenting disciplinary incidents and the actions taken in response. The proposed system replaces or supplements scattered manual records with a central backend database and controlled workflows. CSV files are intended for authorized reporting and data exchange, not as the primary system of record.
+1.3 Objectives
+Maintain consistent digital records of reported incidents and subsequent decisions.
+Allow teachers to submit and track complaints they have reported.
+Enable the principal to approve staff accounts and oversee all cases.
+Enable the school counsellor to review authorized cases and document interventions and follow-ups.
+Provide a reliable history of actions, changes, and case outcomes.
+Generate filtered CSV exports for authorized school and government reporting.
+Protect sensitive student information through role-based access and appropriate security controls.
+1.4 Scope
+The initial release is expected to include:
+Staff authentication, account approval, and role-based authorization.
+Student record lookup and incident submission.
+Principal review, case assignment, status tracking, and action recording.
+Counsellor case access, intervention notes, and follow-up tracking.
+Dashboards, search, filters, case history, and CSV export.
+Audit logging, basic validation, and administrative configuration.
+The system is not intended to make automated disciplinary decisions. Decisions remain the responsibility of authorized school personnel and must follow school policy and applicable regulations.
+1.5 Definitions and Acronyms
+Term
+Definition
+SDMS
+School Disciplinary Management System.
+Incident
+A reported event or concern involving a student that requires review or documentation.
+Case
+The managed record created from an incident report, including reviews, decisions, actions, and follow-ups.
+Principal / Super Admin
+The school authority responsible for staff account approval and overall system oversight.
+Teacher
+An authorized staff member who can submit incidents and track their own reports within permitted access.
+Counsellor
+An authorized staff member who records counselling, intervention, and follow-up information.
+RBAC
+Role-Based Access Control.
+CSV
+Comma-Separated Values, a text-based format for exporting tabular data.
+Audit log
+A record of significant system actions, including who performed the action and when.
+2. Overall Description
+2.1 Product Perspective
+The SDMS will be a browser-based full-stack application. The frontend will communicate with a backend API. The backend will authenticate users, enforce permissions, validate requests, manage case workflows, and persist data in a relational database. CSV exports will be generated from authorized database queries.
+2.2 Product Functions
+Authenticate staff and restrict access until the required account approval is complete.
+Create, view, update, and track incident records according to permissions and case status.
+Allow the principal to review, return, assign, approve, or close cases as defined by school policy.
+Allow the counsellor to record interventions and follow-up outcomes for authorized cases.
+Show dashboards and case lists relevant to each user’s role.
+Search and filter cases using permitted fields.
+Export authorized datasets to CSV with appropriate filters and safeguards.
+Maintain a traceable history of case changes and significant administrative actions.
+2.3 Operating Environment
+Area
+Proposed Requirement
+Client
+Modern desktop and mobile web browsers supported by the school.
+Frontend
+Responsive web application; React or Next.js are possible implementation choices.
+Backend
+REST API or equivalent service; Node.js/Express or Django are possible choices.
+Database
+Relational database such as PostgreSQL; the final choice is a technical design decision.
+Hosting
+School-approved hosting environment with backups, access controls, and secure configuration.
+Export
+CSV download for authorized users; optional future support for other formats subject to approval.
+2.4 Design and Implementation Principles
+The database is the authoritative record; CSV files are generated exports.
+Access is restricted by role and, where necessary, by case assignment or reporting relationship.
+Sensitive counselling notes may require stricter permissions than general incident details.
+Case decisions and status changes should be traceable and should not be silently overwritten.
+The system should support accessible, clear, and responsive user interfaces.
+3. User Classes and Permissions
+Role
+Responsibilities
+Proposed Access
+Teacher
+Report incidents and monitor submitted complaints.
+Create incident reports; view own reports and permitted status/action summaries; add requested clarifications where allowed.
+Principal / Super Admin
+Manage staff access and oversee all cases.
+Approve or deactivate staff accounts; view and manage all cases; assign reviewers; record or approve decisions; view audit logs; export authorized reports; configure basic system settings.
+Counsellor
+Review authorized cases and document student support.
+View cases permitted by school policy; add intervention and follow-up records; update assigned intervention status; view relevant case history.
+System Administrator (optional technical role)
+Maintain application availability and configuration.
+Technical administration only. Access to student case content should be limited and audited unless explicitly authorized.
+Permission boundaries must be confirmed by the school. In particular, access to detailed counselling notes, student-sensitive information, and export functions should be explicitly defined rather than assumed.
+4. Functional Requirements
+Priority key: Must = required for the initial release; Should = important and recommended; Could = optional enhancement.
+4.1 Authentication and Account Management
+ID
+Requirement
+Priority
+Acceptance Criteria
+FR-AUTH-01
+The system shall allow staff to sign in using approved credentials.
+Must
+Valid credentials grant access; invalid credentials are rejected with a safe message.
+FR-AUTH-02
+The system shall prevent unapproved staff accounts from accessing protected functions.
+Must
+An unapproved account cannot open protected pages or call protected APIs.
+FR-AUTH-03
+The principal shall be able to approve, reject, deactivate, or reactivate staff accounts.
+Must
+Each account decision is saved with actor and timestamp.
+FR-AUTH-04
+The system shall assign each active user one or more authorized roles.
+Must
+Role-specific permissions are enforced on the backend.
+FR-AUTH-05
+The system shall provide secure logout and session expiry.
+Must
+A logged-out or expired session cannot access protected data.
+FR-AUTH-06
+The system should support password reset or a school-approved identity provider.
+Should
+The recovery flow follows the configured security policy.
+4.2 Student Records
+ID
+Requirement
+Priority
+Acceptance Criteria
+FR-STU-01
+Authorized users shall be able to search for a student using an approved identifier or permitted fields.
+Must
+Search returns only records the user is permitted to view.
+FR-STU-02
+The system shall associate each incident with a unique student record.
+Must
+An incident cannot be submitted without a valid student reference, unless an approved exception workflow is defined.
+FR-STU-03
+The system should allow authorized users to view a student's relevant case history.
+Should
+History is restricted to authorized roles and displays only permitted details.
+FR-STU-04
+Student information shall be limited to fields necessary for the stated purpose.
+Must
+The implemented student data fields are approved by the school.
+4.3 Incident Submission and Tracking
+ID
+Requirement
+Priority
+Acceptance Criteria
+FR-INC-01
+A teacher shall be able to create an incident report for a student.
+Must
+A valid report is saved with a unique case/incident reference.
+FR-INC-02
+The report shall capture incident date/time, student, category, description, reporting user, and submission timestamp.
+Must
+Required fields are validated before submission.
+FR-INC-03
+The report should support optional witnesses, location, attachments, and immediate safety concerns where approved.
+Should
+Optional fields can be added without blocking otherwise valid submission.
+FR-INC-04
+The system shall show the teacher the list and current status of their submitted reports.
+Must
+The teacher can view their own reports and permitted summaries.
+FR-INC-05
+The system shall allow authorized reviewers to request clarification or additional information.
+Must
+The request and subsequent response are recorded in case history.
+FR-INC-06
+The system shall validate required fields and prevent accidental duplicate submissions where feasible.
+Must
+Validation errors are clear; potential duplicates can be flagged for review.
+FR-INC-07
+The system shall assign each incident a unique reference number.
+Must
+The reference is unique and searchable.
+4.4 Principal Review and Case Management
+ID
+Requirement
+Priority
+Acceptance Criteria
+FR-CASE-01
+The principal shall be able to view all disciplinary cases within the school scope.
+Must
+The principal's case list includes all cases authorized by the school's scope.
+FR-CASE-02
+The principal shall be able to review, return for clarification, assign, approve for action, or close a case as permitted by policy.
+Must
+Only valid status transitions are allowed and are logged.
+FR-CASE-03
+The system shall distinguish staff-account approval from incident/case review.
+Must
+Approving a teacher account does not automatically approve any incident.
+FR-CASE-04
+The principal shall be able to record a decision, rationale, responsible person, and decision date.
+Must
+Decision details are stored against the relevant case.
+FR-CASE-05
+The principal should be able to assign a case to a counsellor or other authorized reviewer.
+Should
+The assignee is notified or can see the assignment in their dashboard.
+FR-CASE-06
+The system shall maintain a chronological case history.
+Must
+Submissions, status changes, decisions, interventions, and closures appear in the history.
+FR-CASE-07
+The system shall support reopening a closed case only for authorized users and with a reason.
+Should
+Reopening creates an auditable event and preserves prior history.
+4.5 Counselling and Interventions
+ID
+Requirement
+Priority
+Acceptance Criteria
+FR-INT-01
+The counsellor shall be able to view cases authorized by the configured access policy.
+Must
+Unauthorized cases and restricted fields are not exposed.
+FR-INT-02
+The counsellor shall be able to record an intervention or counselling session.
+Must
+Each entry includes date, author, intervention type, notes, and next step where applicable.
+FR-INT-03
+The system shall support follow-up dates, responsible staff, and completion status.
+Must
+Overdue and completed follow-ups can be identified.
+FR-INT-04
+The system should support recording a structured outcome or progress assessment.
+Should
+Outcome is recorded using school-approved fields and does not automatically determine punishment.
+FR-INT-05
+The system shall distinguish general case notes from confidential counselling notes where required.
+Must
+Confidential notes are only accessible to specifically authorized roles.
+FR-INT-06
+The system shall allow authorized staff to document actions such as warning, suspension, counselling, restorative activity, or other school-approved measures.
+Must
+Action type, rationale, date, responsible staff, and relevant duration are recorded where applicable.
+4.6 Dashboards, Search, and Notifications
+ID
+Requirement
+Priority
+Acceptance Criteria
+FR-DASH-01
+The system shall display a role-appropriate dashboard after sign-in.
+Must
+Each role sees only permitted metrics and records.
+FR-DASH-02
+The principal dashboard shall summarize total cases, pending reviews, cases in progress, follow-ups due, and closed cases.
+Must
+Counts match the underlying authorized case data.
+FR-DASH-03
+The teacher dashboard shall show submitted reports and their statuses.
+Must
+The list matches the teacher's permitted records.
+FR-DASH-04
+The counsellor dashboard shall show assigned or otherwise authorized cases and follow-ups.
+Must
+The list matches the configured counsellor access rules.
+FR-DASH-05
+Authorized users shall be able to filter case lists by date, status, class, category, and other approved fields.
+Must
+Filters return matching authorized records.
+FR-DASH-06
+The system should provide in-app notifications for assignments, clarification requests, and status changes.
+Should
+Notifications are delivered to the intended authorized user.
+4.7 CSV Export and Reporting
+ID
+Requirement
+Priority
+Acceptance Criteria
+FR-EXP-01
+The principal or other explicitly authorized users shall be able to export filtered records to CSV.
+Must
+Exported rows and fields match the applied filters and permissions.
+FR-EXP-02
+The system shall allow export by an approved date range and selected filters.
+Must
+The resulting export respects selected filters.
+FR-EXP-03
+The system shall exclude fields the exporting user is not authorized to access.
+Must
+Restricted notes and fields do not appear in the exported file.
+FR-EXP-04
+CSV files shall use consistent column headings, date formats, character encoding, and documented values.
+Must
+The file opens correctly in common spreadsheet software and preserves supported characters.
+FR-EXP-05
+The system shall log export activity, including user, timestamp, filters, and record scope where feasible.
+Must
+An audit entry is created for each successful export.
+FR-EXP-06
+The system should warn users before exporting sensitive student information.
+Should
+A clear warning appears before the download.
+FR-EXP-07
+The system should mitigate CSV formula injection for untrusted text values.
+Must
+Values beginning with spreadsheet formula characters are safely handled in exports.
+4.8 Audit and Administration
+ID
+Requirement
+Priority
+Acceptance Criteria
+FR-AUD-01
+The system shall log significant actions including sign-in events, account approvals, case status changes, decisions, and exports.
+Must
+Audit records include actor, action, target record, and timestamp where applicable.
+FR-AUD-02
+Ordinary users shall not be able to modify or delete audit records.
+Must
+Audit logs are protected from standard application-user changes.
+FR-AUD-03
+The system should support approved configuration of incident categories and action types.
+Should
+Only authorized administrators can change configuration.
+FR-AUD-04
+The system shall validate data on the server, even when client-side validation exists.
+Must
+Invalid or unauthorized API requests are rejected.
+5. Business Rules and Case Workflow
+5.1 Proposed Workflow
+Stage
+Description
+1. Staff access
+Teacher account is created or requested; principal approves or rejects it.
+2. Report submitted
+Teacher submits a new incident report. The system creates a unique reference and records the submission.
+3. Initial review
+The case enters the principal's review queue. The principal can review, request clarification, assign, or take another policy-approved action.
+4. Investigation / support
+The principal may assign the case to the counsellor or another authorized staff member, according to policy.
+5. Decision and intervention
+Authorized staff record the approved action, rationale, responsible person, and any intervention or follow-up plan.
+6. Follow-up
+The responsible staff member records progress and completion of planned follow-ups.
+7. Closure
+The principal or other authorized role closes the case when the required actions are completed.
+8. Reporting
+Authorized users search and export appropriate records for school review or approved external reporting.
+5.2 Business Rules
+A user must be authenticated and active before accessing protected functionality.
+A staff account must be approved by the principal before it can access the portal, unless an alternate school-approved onboarding method is selected.
+Account approval and incident approval are separate processes.
+Every submitted incident must have a unique reference and an identifiable reporting user.
+Only authorized roles may change case status, record formal decisions, or close/reopen cases.
+Every significant case change must retain its actor and timestamp; previous history must remain available to authorized reviewers.
+A case may contain multiple actions, interventions, and follow-up entries.
+An incident report must not be treated as proof that the reported allegation is established; the system should distinguish reported facts, review findings, and decisions.
+CSV exports must follow the exporter's permissions and the approved purpose for sharing.
+The application must not automatically assign punishment or make high-impact disciplinary decisions using AI or reinforcement learning.
+6. Data Requirements
+6.1 Core Data Entities
+Entity
+Key Fields (Proposed)
+Notes
+User
+User ID, name, staff identifier, email/username, role, account status, created/approved timestamps
+Credentials should be stored securely or delegated to an approved identity provider.
+Student
+Student ID, name, class/grade, active status, minimum approved contact/context fields
+Collect only data needed for case management.
+Incident / Case
+Case ID, student ID, reporter ID, incident date/time, category, description, location, status, submission timestamp
+Case and incident may be separate tables if one case can cover multiple incidents.
+Case Review
+Review ID, case ID, reviewer ID, review date, result, clarification request, notes
+Review details should be auditable.
+Disciplinary Action
+Action ID, case ID, action type, rationale, start/end date if applicable, responsible user, status
+Examples are configurable and subject to school policy.
+Intervention
+Intervention ID, case ID, counsellor ID, type, date, notes, confidentiality level, outcome
+Restrict confidential counselling notes as required.
+Follow-up
+Follow-up ID, case ID, due date, assigned user, completion date, result, next step
+Supports reminders and overdue reporting.
+Audit Event
+Event ID, actor ID, action, target type/ID, timestamp, metadata
+Avoid storing unnecessary sensitive content in audit metadata.
+Export Log
+Export ID, user ID, timestamp, filters, fields/scope, result
+Record successful exports and failures where feasible.
+6.2 Data Validation
+Each entity shall have a unique primary identifier.
+References to students, users, cases, and actions shall be validated against existing records.
+Required fields shall be checked by the backend before records are saved.
+Date and time values shall use a consistent stored format and be displayed in the school's configured time zone.
+Free-text fields shall have reasonable length limits and be protected against injection attacks.
+The system shall prevent accidental deletion of records required for audit or retention; correction and archival rules must be approved.
+6.3 Retention, Archival, and Deletion
+The school must define record-retention periods, archival rules, legal holds, and approved deletion procedures before production use. The system should support these policies without allowing ordinary users to erase the audit trail. The SRS does not assume a specific statutory retention period.
+7. External Interface Requirements
+7.1 User Interface
+The interface shall provide clear navigation appropriate to each role.
+Forms shall identify required fields and explain validation errors in plain language.
+Case lists shall show a reference number, student identifier or approved display name, incident date, status, and permitted summary fields.
+Sensitive content should not be exposed in dashboard previews, browser notifications, or URLs.
+The interface should be responsive for common desktop, tablet, and mobile screen sizes.
+7.2 Software Interfaces
+Frontend-to-backend communication shall use authenticated, validated API requests over HTTPS in production.
+The database shall be accessible only through the backend or approved database administration channels.
+Any future integration with a school information system, identity provider, email, SMS, or Ministry system requires separate interface and security specifications.
+No external integration is assumed for the initial release unless stakeholders confirm it.
+7.3 File Interface
+The system shall generate CSV files using documented headers and a consistent encoding. The export specification must identify the permitted columns, date format, value conventions, and whether identifiers or names are included. Importing CSV data into the live database is not included unless separately approved and specified.
+8. Non-Functional Requirements
+ID
+Requirement
+Priority
+Acceptance Criteria
+NFR-SEC-01
+The system shall enforce server-side authorization on every protected operation.
+Must
+Direct API requests cannot bypass UI role restrictions.
+NFR-SEC-02
+Production traffic shall be protected using HTTPS/TLS.
+Must
+HTTP is redirected or otherwise blocked for protected production access.
+NFR-SEC-03
+Passwords shall never be stored in plaintext.
+Must
+Password storage uses a suitable password hashing mechanism or an approved identity provider.
+NFR-SEC-04
+The system shall use secure session handling and appropriate protections against common web attacks.
+Must
+Security testing finds no unresolved critical issue in agreed scope.
+NFR-SEC-05
+The system shall protect confidential student and counselling data from unauthorized access.
+Must
+Role and field-level access tests pass.
+NFR-PRV-01
+The system shall collect and expose only data necessary for its approved purpose.
+Must
+Fields and exports are reviewed and approved by the school.
+NFR-AVL-01
+The system should target 99.5% monthly availability excluding planned maintenance, subject to hosting capability.
+Should
+Availability is monitored against an agreed service definition.
+NFR-PERF-01
+For the agreed pilot dataset and hosting environment, common pages and searches should respond within 3 seconds at the 95th percentile.
+Should
+Load tests use an agreed dataset and concurrent-user profile.
+NFR-PERF-02
+CSV export shall complete within an agreed time for the expected report size.
+Should
+A maximum export size and performance target are agreed before acceptance.
+NFR-USE-01
+The system shall provide understandable status labels and validation messages.
+Must
+Representative users can complete core tasks in usability testing.
+NFR-ACC-01
+The interface should follow recognized accessibility practices, targeting WCAG 2.2 AA where feasible.
+Should
+Accessibility review covers key workflows.
+NFR-REL-01
+The system shall preserve data integrity when saving related records.
+Must
+Failure tests do not leave inconsistent partial records.
+NFR-BCP-01
+Backups shall be performed on a school-approved schedule and restoration shall be tested.
+Must
+A documented backup and restore test is completed before production.
+NFR-MNT-01
+The application shall separate configuration from source code and provide maintainable documentation.
+Should
+Deployment, configuration, and support instructions are provided.
+NFR-COMP-01
+The system shall be reviewed against applicable school, Ministry, privacy, and records-management requirements before deployment.
+Must
+The school records approval or identifies required remediation.
+The numerical targets above are proposed starting points, not confirmed contractual commitments. They must be validated against the expected user count, hosting budget, operational needs, and stakeholder requirements.
+9. Reporting and CSV Export
+9.1 Proposed Export Fields
+The exact export schema must be approved by the school. A standard administrative export may include the following fields when the requesting user is authorized:
+Case reference
+Student identifier and approved student display field
+Class or grade
+Incident date and submission date
+Incident category and description, if approved for the report
+Reporting staff identifier or approved staff display field
+Current case status
+Review decision and decision date
+Action type, action date, and responsible staff member
+Intervention/follow-up status and outcome, only where permitted
+Closure date
+9.2 Export Controls
+The user shall select an approved date range and permitted filters before export.
+The system shall apply the same authorization rules to exported data as to on-screen data.
+Confidential counselling notes shall be excluded from general exports unless explicit authorization and purpose are established.
+The export action shall be logged and a warning shall remind users to handle student data securely.
+The school shall define an approved process for sharing exported files with staff or external government organizations.
+10. Security, Privacy, and Audit
+Use least-privilege access: each role receives only the permissions necessary for its duties.
+Enforce authorization in the backend for pages, APIs, individual records, and export fields.
+Protect data in transit and use suitable at-rest protection based on hosting and risk assessment.
+Maintain an audit trail for access and important changes, including account administration, case decisions, and exports.
+Avoid exposing student names or sensitive incident details in URLs, error messages, analytics, or routine notifications.
+Define how suspected security incidents, unauthorized access, and accidental disclosures are reported and handled.
+Approve data retention, backups, recovery, access review, and account deactivation procedures.
+Before external sharing, verify legal authority, recipient, purpose, scope, and minimum required fields.
+Conduct security testing before launch and after material changes.
+11. Assumptions, Dependencies, and Constraints
+11.1 Assumptions
+The school will appoint the principal or another authorized representative to approve requirements and policies.
+The school can provide an authoritative student list or define how student records will be created and maintained.
+The school will define which incident categories, action types, and case statuses are permitted.
+Staff will use the system only for legitimate school purposes and follow confidentiality rules.
+A school-approved hosting environment and operational owner will be available.
+11.2 Dependencies
+Confirmation of applicable Ministry requirements and school policies.
+Agreement on account onboarding, identity verification, and password recovery.
+Agreement on student identifiers and any existing data source.
+Availability of hosting, domain, backup, and security arrangements.
+Approval of CSV fields and the procedure for external data sharing.
+11.3 Constraints
+The system handles sensitive information relating to minors and requires heightened confidentiality.
+The initial release is a web application; native mobile applications are not assumed.
+CSV is an export format and is not the authoritative transactional data store.
+Automated punishment decisions and reinforcement-learning-based disciplinary recommendations are not part of the initial release.
+12. Out of Scope
+Automatic determination of guilt, risk scores, or disciplinary punishment using AI.
+Reinforcement learning that changes student interventions or sanctions automatically.
+Parent/student portal access unless separately approved.
+Direct integration with Ministry systems, student information systems, email, SMS, or national identity systems.
+Bulk import or synchronization from CSV into the production database.
+Legal determination of compliance; the system supports documentation but does not replace school policy or legal review.
+Payroll, attendance, examinations, fees, and other general school ERP functions.
+13. Acceptance Criteria
+The initial release will be considered ready for stakeholder acceptance when the following conditions are met:
+An unapproved staff account cannot access protected system functions, and the principal can approve or reject it.
+An approved teacher can submit an incident with required fields and receive a unique reference number.
+The teacher can view the status of their own submitted reports but cannot view unauthorized cases.
+The principal can see all cases in scope, review them, request clarification, assign cases, record decisions, and close cases according to the approved workflow.
+The counsellor can access only authorized cases and record interventions and follow-ups.
+The system retains a chronological history of submissions, reviews, decisions, actions, and closures.
+Dashboards and filters display correct data for each role.
+An authorized user can export a filtered CSV with the approved columns, and unauthorized fields are excluded.
+Successful exports and important administrative/case actions are logged.
+Security tests verify backend authorization, session handling, and protection of restricted records.
+Backup and restoration procedures are documented and tested.
+School stakeholders approve the workflow, data fields, retention policy, access matrix, and export process.
+14. Open Questions and Decisions
+The following items must be resolved with the school before the requirements are baselined. Defaults below are proposals for discussion, not confirmed decisions.
+ID
+Question / Decision Needed
+Proposed Starting Point
+OD-01
+Can the counsellor view a submitted case immediately, or only after principal review?
+Counsellor can see a case after submission only if school policy permits; principal review remains a separate workflow step.
+OD-02
+Can teachers see only their own reports or all cases concerning students they teach?
+Own reports only, with carefully limited status and action summaries.
+OD-03
+Who may formally approve a disciplinary action or close a case?
+Principal, or another role explicitly delegated by school policy.
+OD-04
+Which fields in counselling notes are confidential and who can access them?
+Restrict detailed notes to the counsellor and explicitly authorized school leadership.
+OD-05
+What student information will be stored locally versus obtained from an existing school system?
+Store the minimum required data and use an authoritative student identifier.
+OD-06
+What are the required retention and deletion periods?
+School to confirm with applicable Ministry and privacy requirements before launch.
+OD-07
+Which government bodies or staff may receive CSV exports, and which columns are required?
+Create approved export templates and log every export.
+OD-08
+Are attachments, photographs, witness statements, or incident evidence required?
+Optional in the first release unless the school confirms otherwise; if included, define access and retention controls.
+OD-09
+Are email, SMS, or in-app notifications required?
+In-app notifications as the baseline; external channels are optional pending approval.
+OD-10
+What are expected user counts, peak usage, hosting budget, and availability needs?
+Confirm before finalizing performance and hosting targets.
+OD-11
+Is there a required technology stack or existing school IT environment?
+Select after technical review; proposed stack is not binding.
+OD-12
+Does the Ministry prescribe a specific reporting format or template?
+Obtain the official template and map approved fields before export implementation.
+OD-13
+Is there a requirement for Arabic, English, or bilingual interfaces and reports?
+Confirm language and right-to-left layout requirements before UI design.
+OD-14
+How will staff accounts be created and identities verified?
+Principal-approved invitation or school-approved identity provider.
+Appendix A. Proposed Case Statuses
+Status
+Meaning
+Draft
+Report is being prepared and has not been submitted.
+Submitted
+Report has been submitted and is awaiting initial review.
+Under Review
+An authorized reviewer is assessing the report.
+Clarification Required
+The reporter or another authorized person must provide more information.
+Assigned
+The case has been assigned for investigation, review, or intervention.
+Action Pending
+A decision has been recorded or approved action is awaiting implementation.
+Follow-up Pending
+An intervention or action has been completed or started, and follow-up remains due.
+Closed
+Required review and actions are complete according to policy.
+Reopened
+An authorized user has reopened the case with a recorded reason.
+Rejected / No Further Action
+The authorized reviewer has determined that no further action is required; rationale must be recorded.
+The school should confirm the final status list and allowed transitions. Not every status needs to be exposed to every role.
+Appendix B. Glossary
+Term
+Meaning
+Account approval
+Permission for a staff member to access the system.
+Case review
+Assessment of a submitted incident by an authorized school official.
+Disciplinary action
+A school-approved response recorded against a case.
+Intervention
+A support measure, such as counselling or a restorative activity, intended to address needs or behaviour.
+Follow-up
+A later check to assess completion or progress after an action or intervention.
+CSV export
+A downloadable tabular representation of authorized records for reporting or data exchange.
+Least privilege
+Giving a user only the access needed to perform assigned duties.

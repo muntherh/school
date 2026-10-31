@@ -40,15 +40,15 @@ export class CSVExportService {
       return ''
     }
 
-    const stringValue = String(value)
+    let stringValue = String(value)
 
     // Prevent CSV formula injection by prefixing with tab if starts with =, +, -, @
     if (/^[=+\-@]/.test(stringValue)) {
-      return `\t${stringValue}`
+      stringValue = `\t${stringValue}`
     }
 
     // If value contains comma, quote, newline, or tab, wrap in quotes and escape quotes
-    if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n') || stringValue.includes('\t')) {
+    if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\r') || stringValue.includes('\n') || stringValue.includes('\t')) {
       return `"${stringValue.replace(/"/g, '""')}"`
     }
 
@@ -131,7 +131,7 @@ export class CSVExportService {
     }
 
     // Only add confidential fields if explicitly authorized
-    if (includeConfidential && (userRole === 'PRINCIPAL' || userRole === 'COUNSELLOR')) {
+    if (false) {
       fields = [...fields, ...confidentialFields]
     }
 

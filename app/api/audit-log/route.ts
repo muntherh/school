@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { AuditService } from '@/services/audit.service'
 import { successResponse, errorResponse } from '@/lib/api-response'
@@ -6,6 +7,8 @@ import { withAuth, authErrorResponse, permissionErrorResponse } from '@/lib/midd
 // GET /api/audit-log - Get audit log with filters
 export async function GET(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {
