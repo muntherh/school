@@ -8,23 +8,17 @@ export class CaseService {
    */
   static async generateReferenceNumber(): Promise<string> {
     const year = new Date().getFullYear()
-    const count = await prisma.case.count({
-      where: {
-        referenceNumber: {
-          startsWith: `INC-${year}`,
-        },
-      },
-    })
-    const sequence = String(count + 1).padStart(4, '0')
-    return `INC-${year}-${sequence}`
+    return `INC-${year}-${crypto.randomUUID()}`
   }
 
   /**
    * Get cases with filters and pagination
    */
   static async getCases(filters: {
+    search?: string
     status?: string
     studentId?: string
+    assignedToId?: string
     reporterId?: string
     category?: string
     incidentDateFrom?: string
@@ -39,6 +33,8 @@ export class CaseService {
       const skip = (page - 1) * limit
 
       const where: any = {}
+      if (validatedFilters.search) where.OR = [{ referenceNumber: { contains: validatedFilters.search, mode: 'insensitive' } }, { description: { contains: validatedFilters.search, mode: 'insensitive' } }]
+      if (validatedFilters.assignedToId) where.assignedToId = validatedFilters.assignedToId
 
       if (validatedFilters.status) {
         where.status = validatedFilters.status
@@ -208,7 +204,9 @@ export class CaseService {
     try {
       // Extract reporterId before validation (it comes from auth context, not request body)
       const { reporterId, ...caseData } = data
-      const validatedData = createCaseSchema.parse(caseData)
+      const selectedStudent = await prisma.student.findFirst({ where: { OR: [{ id: caseData.studentId }, { studentId: caseData.studentId }], activeStatus: true } })
+      if (!selectedStudent) throw new Error('Active student not found')
+      const validatedData = createCaseSchema.parse({ ...caseData, studentId: selectedStudent.id })
 
       // Verify student exists
       const student = await prisma.student.findUnique({

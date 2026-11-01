@@ -27,9 +27,6 @@ export default function CaseReviewPage() {
     try {
       const response = await api.createCaseReview(params.id as string, formData)
       if (response.success) {
-        // Update case status based on review result
-        const newStatus = formData.result === 'APPROVED' ? 'ASSIGNED' : 'CLARIFICATION_REQUIRED'
-        await api.updateCaseStatus(params.id as string, newStatus, formData.notes)
         router.push(`/cases/${params.id}`)
       } else {
         setError(response.error?.message || 'Failed to create review')
@@ -74,8 +71,8 @@ export default function CaseReviewPage() {
                 onChange={(e) => handleChange('result', e.target.value)}
                 options={[
                   { value: '', label: 'Select result' },
-                  { value: 'APPROVED', label: 'Approve - Proceed to Assignment' },
-                  { value: 'REJECTED', label: 'Reject - Request Clarification' },
+                  { value: 'APPROVED', label: 'Approve - Action Required' },
+                  { value: 'REJECTED', label: 'Reject Case' },
                   { value: 'CLOSED', label: 'Close - No Further Action' },
                 ]}
                 required

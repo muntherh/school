@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || ''
 
 export interface ApiResponse<T = any> {
   success: boolean
@@ -72,6 +72,8 @@ export const api = {
 
   getCurrentUser: () =>
     request('/api/auth/me'),
+
+  getAssignableUsers: () => request('/api/users/assignable'),
 
   // Users
   getUsers: (params?: { status?: string; role?: string; search?: string }) => {

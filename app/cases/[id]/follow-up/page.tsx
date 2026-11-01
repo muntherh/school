@@ -29,7 +29,7 @@ export default function FollowUpPage() {
 
   const loadUsers = async () => {
     try {
-      const response = await api.getUsers({ status: 'ACTIVE' })
+      const response = await api.getAssignableUsers()
       if (response.success && response.data) {
         setUsers(Array.isArray(response.data) ? response.data : [])
       }

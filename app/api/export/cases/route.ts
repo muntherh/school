@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { CSVExportService, ExportOptions, ExportFilters } from '@/lib/services/csv-export.service'
 import { withAuth, authErrorResponse, permissionErrorResponse } from '@/lib/middleware'
@@ -5,6 +6,8 @@ import { withAuth, authErrorResponse, permissionErrorResponse } from '@/lib/midd
 // POST /api/export/cases - Export cases to CSV
 export async function POST(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {
@@ -65,6 +68,8 @@ export async function POST(request: NextRequest) {
 // GET /api/export/cases/stats - Get export statistics
 export async function GET(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {

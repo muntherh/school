@@ -30,7 +30,7 @@ describe('Authentication Security Tests', () => {
       const result = await AuthService.login('test@example.com', 'password123')
       
       expect(result.success).toBe(false)
-      expect(result.error).toContain('not active')
+      expect(result.error).toBe('Invalid credentials')
     })
 
     it('should reject login for deactivated accounts', async () => {
@@ -48,7 +48,7 @@ describe('Authentication Security Tests', () => {
       const result = await AuthService.login('test@example.com', 'password123')
       
       expect(result.success).toBe(false)
-      expect(result.error).toContain('not active')
+      expect(result.error).toBe('Invalid credentials')
     })
 
     it('should reject login for rejected accounts', async () => {
@@ -66,7 +66,7 @@ describe('Authentication Security Tests', () => {
       const result = await AuthService.login('test@example.com', 'password123')
       
       expect(result.success).toBe(false)
-      expect(result.error).toContain('not active')
+      expect(result.error).toBe('Invalid credentials')
     })
 
     it('should allow login for active accounts', async () => {

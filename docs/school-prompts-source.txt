@@ -1,0 +1,236 @@
+School Disciplinary
+ Management
+ System Prompts:
+Prompt 1
+I am developing a full-stack web application called 
+School Disciplinary Management System (SDMS)
+. Use the attached Software Requirements Specification (SRS) as the primary source of truth.
+The application will allow teachers to report student disciplinary incidents, the principal to manage staff access and review all cases, and the school counsellor to document interventions and follow-ups. Authorized users must be able to export approved records to CSV.
+Technology stack:
+Next.js with TypeScript
+Tailwind CSS
+PostgreSQL with Prisma ORM
+Secure server-side authentication and role-based access control
+Zod for validation
+Recharts for dashboards
+Vitest
+ and Playwright for testing
+Before implementing anything:
+Analyze the SRS and extract all functional requirements, non-functional requirements, business rules, user roles, and acceptance criteria.
+Identify ambiguities, contradictions, and missing decisions. Do not silently invent school policies.
+Propose a modular architecture, database entity relationships, application routes, API endpoints, permissions matrix, and implementation roadmap.
+Identify the minimum viable product (MVP) and separate it from optional future features.
+Establish a requirements traceability matrix mapping every SRS requirement to planned components and tests.
+Create a maintainable project structure and document the architecture in README.md and the implementation plan in docs/implementation-plan.md.
+Do not build the entire application in one response. First provide the analysis, architecture, and unresolved questions. Wait for my approval before proceeding to implementation.
+Important constraints:
+PostgreSQL must be the authoritative data store; CSV is only for authorized export.
+Never use mock data as a substitute for required backend functionality.
+Never rely on frontend-only permission checks.
+Do not implement AI-generated punishments or automated disciplinary decisions.
+Do not expose sensitive student records in logs, URLs, or unauthorized exports.
+Prompt 2
+Implement the database and backend foundation for the School Disciplinary Management System using the approved architecture and SRS.
+Database entities should include:
+Users and roles
+Students
+Incident reports and disciplinary cases
+Case reviews and clarification requests
+Disciplinary actions and decisions
+Counselling interventions
+Follow-up records
+Audit events
+CSV export logs
+Notifications, if included in the approved MVP
+Requirements:
+Define appropriate primary keys, foreign keys, indexes, unique constraints, timestamps, and relationships.
+Use Prisma migrations and provide a reproducible database setup.
+Define enumerated case statuses and valid status transitions.
+Preserve case history and auditability. Do not silently overwrite important decisions.
+Separate general case notes from confidential counselling notes, with appropriate authorization.
+Validate all incoming data using Zod or an equivalent validation layer.
+Implement consistent API error handling, pagination, filtering, and server-side validation.
+Enforce role-based and record-level authorization on every protected endpoint.
+Use database transactions when multiple related records must be saved consistently.
+Create seed scripts containing clearly fictional test users and student records only.
+Create automated tests for database relationships, validation, access restrictions, and status transitions.
+Deliver working backend code, migrations, seed scripts, and setup documentation. Do not claim a feature is implemented until its code and tests exist. Run the available checks and report failures honestly.
+Prompt 3
+Implement secure authentication and authorization for the SDMS using the existing project architecture.
+Create three primary application roles:
+1. Principal / Super Admin
+Approves, rejects, deactivates, and reactivates staff accounts.
+Can view and manage all cases within the school.
+Can review complaints, request clarification, assign cases, record decisions, approve actions, close or reopen cases according to policy.
+Can access audit logs and authorized CSV exports.
+2. Teacher
+Can access the portal only after account approval.
+Can submit incident reports linked to valid students.
+Can view their own submitted reports and authorized status updates.
+Cannot access unrelated cases, confidential counselling notes, administrative controls, or unrestricted exports.
+3. Counsellor
+Can access cases permitted by the configured school policy.
+Can document counselling sessions, interventions, and follow-ups.
+Cannot approve staff accounts or perform principal-only actions.
+Implement:
+Secure login and logout.
+Password hashing using a suitable established library if password-based authentication is selected.
+Secure, HTTP-only, appropriately configured session cookies.
+Server-side role and record-level permission checks.
+Protected routes and APIs.
+Account approval and deactivation enforcement.
+Session expiration and safe authentication error handling.
+Audit events for account approvals and other significant security events.
+Do not create a public self-registration flow unless explicitly approved. Use an administrator-approved invitation or onboarding mechanism.
+Test unauthorized direct API calls, privilege escalation attempts, inactive accounts, and cross-user record access. A hidden button or protected frontend page alone is not sufficient security.
+Integrate the implementation with the existing database and frontend. Document the environment variables and secure setup process. Never hardcode production credentials.
+Prompt 4
+Build the complete responsive frontend for the School Disciplinary Management System, connected to the existing backend and database.
+Design direction:
+ professional school administration software, clean blue-and-white interface, accessible typography, restrained colors, clear status badges, consistent spacing, responsive tables, and a polished desktop and mobile experience.
+Create these pages:
+Shared pages
+Login
+Unauthorized and access-denied screens
+Account pending approval
+User profile and logout
+Principal dashboard
+Total reported incidents
+Pending reviews
+Cases under review or investigation
+Actions pending
+Follow-ups due
+Closed cases
+Charts showing incident trends by date, category, class, and status
+Recent case activity and pending staff approvals
+Teacher dashboard
+Submitted reports
+Reports awaiting review
+Reports requiring clarification
+Processed and closed reports
+Submit incident button
+Table showing the teacher's own reports and permitted case updates
+Counsellor dashboard
+Assigned or authorized cases
+Upcoming and overdue follow-ups
+Intervention records
+Follow-up completion status
+Case management pages
+Searchable, filterable case table
+Case details and chronological history
+Incident submission form
+Principal review and decision form
+Counselling and intervention form
+Follow-up creation and completion form
+Authorized reporting and CSV export page
+Requirements:
+Use reusable components and a consistent design system.
+Use real API responses, loading states, empty states, error messages, and confirmation dialogs.
+Apply role-specific navigation without treating frontend navigation as the security boundary.
+Implement functional forms with validation and clear success or failure feedback.
+Ensure charts and dashboard counts come from actual database queries.
+Add pagination, sorting, and filters to large tables.
+Never expose confidential student data in dashboard summaries or previews unless the user is authorized.
+Do not use fake buttons, placeholder pages, or static dashboard numbers as finished features.
+Complete one role's end-to-end workflow at a time and verify each screen against the SRS.
+Prompt 5
+Implement the complete disciplinary incident and case management workflow in the SDMS.
+Teacher workflow
+Search for a student using an approved identifier.
+Submit an incident report with the incident date, category, description, and required fields.
+Receive a unique case reference.
+View the submitted report and its current status.
+Respond to authorized clarification requests.
+View permitted updates after review or action.
+Principal workflow
+View newly submitted cases.
+Review the incident details.
+Request clarification, assign the case, record a decision, or take another approved action.
+Record the decision rationale and responsible staff member.
+Approve or record school-authorized disciplinary measures.
+Monitor interventions and follow-ups.
+Close or reopen cases with a recorded reason.
+Counsellor workflow
+View cases allowed by the configured permissions.
+Record counselling sessions and intervention plans.
+Assign follow-up dates and responsible staff.
+Record progress and outcomes.
+Mark follow-ups completed or identify additional support required.
+Implement explicit status transitions, such as:
+Submitted → Under Review → Clarification Required or Assigned → Action Pending → Follow-up Pending → Closed.
+Adapt this example to the approved SRS. Support rejection or closure without further action where school policy allows it.
+Every important event must record the acting user, timestamp, affected case, and relevant change. Prevent unauthorized transitions, duplicate submissions where feasible, and concurrent updates from silently overwriting one another.
+Important:
+A reported allegation is not automatically an established finding.
+Account approval is separate from case approval.
+Record the action and rationale without assuming that every complaint requires punishment.
+The system must not automatically determine guilt or sanctions.
+Confidential counselling notes must follow their own permissions.
+Implement backend logic, database persistence, frontend integration, and automated tests for normal workflows, invalid transitions, and unauthorized access. Demonstrate the workflow using fictional test data.
+Prompt 6
+Implement production-quality CSV reporting and audit logging for the SDMS.
+CSV reporting requirements
+Allow authorized users to filter records by date range, case status, incident category, class, and other approved fields.
+Generate CSV exports from PostgreSQL data, not from frontend tables or manually maintained files.
+Use a consistent schema, UTF-8 encoding, and documented date formats.
+Support correct handling of commas, quotation marks, newlines, and Unicode text.
+Apply backend authorization to every record and field before export.
+Exclude confidential counselling notes and other restricted fields unless explicitly authorized.
+Add a clear warning before downloading sensitive student data.
+Mitigate CSV formula injection in untrusted values.
+Use pagination, streaming, or sensible export limits for large datasets.
+Log the exporting user, timestamp, applied filters, export scope, and result.
+Audit logging requirements
+Record staff account approvals and deactivations.
+Record incident submission and significant case modifications.
+Record case status changes, assignments, decisions, actions, and closure or reopening.
+Record intervention and follow-up changes, respecting the confidentiality of the underlying content.
+Record successful exports and relevant failed attempts.
+Protect audit records from modification by ordinary users.
+Create tests proving that a teacher cannot export other teachers' cases, a counsellor cannot export restricted notes, and the principal can export only fields allowed by the approved policy.
+Provide a documented example CSV schema and fictional test exports. Never use real student information in development samples.
+Prompt 7
+Perform a systematic security and quality review of the SDMS against its SRS.
+Do not simply list recommendations. Inspect the actual implementation, run the available checks, fix confirmed defects, and report anything that remains unresolved.
+Review and test:
+Authentication, session handling, account approval, and deactivation.
+Backend role-based and record-level authorization.
+Direct API access and attempts to access another user's records.
+Confidential counselling note access.
+Input validation, SQL injection exposure, cross-site scripting, and CSRF risks where applicable.
+Secure cookie configuration, secret management, and production environment configuration.
+Rate limiting and protections for authentication endpoints.
+Audit log integrity and coverage.
+CSV formula injection and unauthorized data exports.
+Database constraints, transaction handling, and data consistency.
+Backup and restore procedures.
+Error handling and prevention of sensitive data leakage.
+Automated test coverage for core business workflows.
+Responsive UI and accessibility of the principal, teacher, and counsellor workflows.
+Run linting, type checking, unit tests, integration tests, and relevant end-to-end tests. Add missing tests and fix failures where possible.
+Use fictional test records only. Do not expose actual student data, production credentials, or sensitive environment variables.
+Deliver a security findings report with severity, affected component, evidence, remediation, and residual risks. Do not claim the system is secure or production-ready solely because the build succeeds.
+Prompt 8
+Prepare the SDMS for a controlled pilot deployment in a school-approved environment.
+Tasks:
+Document local setup, dependencies, environment variables, database creation, migrations, and seed procedures.
+Provide a production deployment guide for the selected hosting environment.
+Configure production-safe authentication, HTTPS, secure cookies, secrets, and database access.
+Configure automated database backups and document a tested restoration procedure.
+Ensure development seed data cannot accidentally be loaded into production.
+Provide health checks, structured operational logging, and error monitoring without exposing student information.
+Document how the principal approves staff accounts, manages roles, and deactivates access.
+Document incident reporting, case review, counselling, follow-up, closure, and CSV export procedures.
+Execute the acceptance tests from the SRS and update the requirements traceability matrix.
+Identify any requirements not implemented, any outstanding bugs, and any policies awaiting school approval.
+Before declaring the application ready, verify that:
+A teacher can submit a report and track it.
+The principal can review the report and record an authorized decision.
+The counsellor can document an intervention and follow-up within their permissions.
+The principal can inspect the case history.
+An authorized user can export an appropriate CSV.
+Unauthorized users cannot access restricted records through the UI, APIs, or exports.
+All significant actions are traceable.
+Database backups and restoration are verified.
+Do not use real student records during testing. Do not claim compliance with Ministry or privacy requirements without documented review and approval by the appropriate school stakeholders.
+Finish with a deployment checklist, acceptance-test results, unresolved issues, and a clear go/no-go recommendation for the pilot.

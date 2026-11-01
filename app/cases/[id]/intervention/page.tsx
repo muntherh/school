@@ -27,7 +27,7 @@ export default function InterventionPage() {
     setIsLoading(true)
 
     try {
-      const response = await api.createIntervention(params.id as string, formData)
+      const response = await api.createIntervention(params.id as string, { ...formData, date: formData.interventionDate })
       if (response.success) {
         router.push(`/cases/${params.id}`)
       } else {

@@ -5,6 +5,8 @@ import { AuditService } from '@/services/audit.service'
 
 export async function POST(request: NextRequest) {
   try {
+    const origin = request.headers.get('origin')
+    if (origin && origin !== new URL(process.env.NEXT_PUBLIC_APP_URL || request.url).origin) return NextResponse.json({success:false},{status:403})
     const session = await requireSession()
     
     // Log logout event

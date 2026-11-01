@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { successResponse, errorResponse } from '@/lib/api-response'
@@ -9,6 +10,8 @@ export async function GET(
   { params }: { params: Promise<{ key: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {
@@ -37,6 +40,8 @@ export async function PATCH(
   { params }: { params: Promise<{ key: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {
@@ -50,6 +55,7 @@ export async function PATCH(
 
     const { key } = await params
     const body = await request.json()
+    if (!['INCIDENT_CATEGORIES','ACTION_TYPES','INTERVENTION_TYPES'].includes(key) || !Array.isArray(body.value) || body.value.length === 0 || body.value.length > 100 || body.value.some((v:unknown) => typeof v !== 'string' || !v.trim() || v.length > 200)) return NextResponse.json(errorResponse('VALIDATION_ERROR','Expected a non-empty category list'),{status:400})
     
     const configuration = await prisma.configuration.update({
       where: { key },

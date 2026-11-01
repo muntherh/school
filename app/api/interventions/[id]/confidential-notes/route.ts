@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { InterventionService } from '@/services/intervention.service'
 import { successResponse, errorResponse } from '@/lib/api-response'
@@ -10,6 +11,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {
@@ -17,14 +20,14 @@ export async function GET(
     }
 
     // Check if user can view confidential notes
-    if (!canViewConfidentialNotes(auth.user.role as any, '', auth.user.id)) {
+    if (!canViewConfidentialNotes(auth.user.role as any, auth.user.id, auth.user.id)) {
       return permissionErrorResponse('You do not have permission to view confidential notes')
     }
 
     const { id } = await params
     const notes = await InterventionService.getConfidentialNotes(id)
 
-    return NextResponse.json(successResponse(notes))
+    return NextResponse.json(successResponse(auth.user.role === 'PRINCIPAL' ? notes : notes.filter(n => n.createdBy === auth.user.id)))
   } catch (error: any) {
     console.error('Get confidential notes error:', error)
     return NextResponse.json(errorResponse('INTERNAL_ERROR', 'Failed to get confidential notes'), { status: 500 })
@@ -37,6 +40,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {

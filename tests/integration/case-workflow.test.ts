@@ -10,7 +10,7 @@ describe('Case Workflow Service', () => {
   let studentId: string
   let caseId: string
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     // Create test users
     const principal = await prisma.user.create({
       data: {
@@ -84,17 +84,6 @@ describe('Case Workflow Service', () => {
     caseId = testCase.id
   })
 
-  afterAll(async () => {
-    // Clean up all test data
-    await prisma.followUp.deleteMany()
-    await prisma.intervention.deleteMany()
-    await prisma.disciplinaryAction.deleteMany()
-    await prisma.caseReview.deleteMany()
-    await prisma.case.deleteMany()
-    await prisma.auditEvent.deleteMany()
-    await prisma.user.deleteMany()
-    await prisma.student.deleteMany()
-  })
 
   describe('Status Transitions', () => {
     it('should allow valid transition from SUBMITTED to UNDER_REVIEW', async () => {
@@ -348,6 +337,7 @@ describe('Case Workflow Service', () => {
       })
 
       expect(result.success).toBe(false)
+      expect(await prisma.caseReview.count({ where: { caseId } })).toBe(0)
     })
   })
 
@@ -383,6 +373,20 @@ describe('Case Workflow Service', () => {
       expect(result.success).toBe(true)
       expect(result.case?.status).toBe('ASSIGNED')
       expect(result.case?.assignedToId).toBe(counsellorId)
+    })
+
+    it('does not leave reviews or assignments after an invalid decision', async () => {
+      const result = await CaseWorkflowService.recordDecision(caseId, 'APPROVED', 'Assign', principalId, 'missing-user')
+      expect(result.success).toBe(false)
+      expect(await prisma.caseReview.count({ where: { caseId } })).toBe(0)
+      expect((await prisma.case.findUnique({ where: { id: caseId } }))?.status).toBe('SUBMITTED')
+    })
+
+    it('rejects decisions by a teacher', async () => {
+      const record = await prisma.case.findUniqueOrThrow({ where: { id: caseId } })
+      const result = await CaseWorkflowService.recordDecision(caseId, 'CLOSED', 'Close', record.reporterId)
+      expect(result.success).toBe(false)
+      expect(await prisma.caseReview.count({ where: { caseId } })).toBe(0)
     })
 
     it('should close case when decision is CLOSED', async () => {

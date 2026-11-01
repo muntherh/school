@@ -1,3 +1,6 @@
+import { expect } from 'vitest'
+function needsDatabase() { return !expect.getState().testPath?.includes('/unit/') }
+if (process.env.DATABASE_URL && !new URL(process.env.DATABASE_URL).pathname.endsWith('_test')) throw new Error('Tests require a dedicated database whose name ends with _test')
 import { prisma } from '@/lib/prisma'
 import { beforeAll, afterAll, beforeEach } from 'vitest'
 
@@ -12,6 +15,8 @@ afterAll(async () => {
 })
 
 beforeEach(async () => {
+  if (!needsDatabase()) return
+  if (!process.env.DATABASE_URL) throw new Error('Dedicated _test database required')
   // Clean up database before each test
   // This is a simple approach - in production, use transactions or test database
   const deleteOrder = [

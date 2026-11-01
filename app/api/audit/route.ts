@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { AuditService } from '@/services/audit.service'
 import { withAuth, authErrorResponse, permissionErrorResponse } from '@/lib/middleware'
@@ -5,6 +6,8 @@ import { withAuth, authErrorResponse, permissionErrorResponse } from '@/lib/midd
 // GET /api/audit - Get audit log with filters
 export async function GET(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {
@@ -29,6 +32,8 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await AuditService.getAuditLog(filters)
+    // Technical administration does not grant access to counselling/case content.
+    if (auth.user.role === 'ADMIN') result.events = result.events.map(event => ({ ...event, metadata: null }))
 
     return NextResponse.json({ success: true, data: result })
   } catch (error: any) {
@@ -43,6 +48,8 @@ export async function GET(request: NextRequest) {
 // DELETE /api/audit - Delete audit records (Admin only)
 export async function DELETE(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withAuth(request)
     
     if (!auth) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -12,6 +12,8 @@ import { ArrowLeft, Save } from 'lucide-react'
 
 export default function NewCasePage() {
   const router = useRouter()
+  const [categories, setCategories] = useState<string[]>([])
+  useEffect(() => { fetch('/api/configuration/INCIDENT_CATEGORIES').then(r=>r.json()).then(r=>{if(r.success) setCategories(r.data.value)}) }, [])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
@@ -82,14 +84,7 @@ export default function NewCasePage() {
                 label="Category"
                 value={formData.category}
                 onChange={(e) => handleChange('category', e.target.value)}
-                options={[
-                  { value: '', label: 'Select category' },
-                  { value: 'Behavioral Issue', label: 'Behavioral Issue' },
-                  { value: 'Academic Dishonesty', label: 'Academic Dishonesty' },
-                  { value: 'Attendance Issue', label: 'Attendance Issue' },
-                  { value: 'Safety Violation', label: 'Safety Violation' },
-                  { value: 'Other', label: 'Other' },
-                ]}
+                options={[{value:'',label:'Select category'}, ...categories.map(value=>({value,label:value}))]}
                 required
               />
 

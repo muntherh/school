@@ -1,0 +1,3 @@
+'use client'
+import {useEffect,useState} from 'react'
+export function CaseHistory({id}:{id:string}){const [events,setEvents]=useState<any[]>([]);const [error,setError]=useState('');useEffect(()=>{fetch(`/api/cases/${id}/history`).then(r=>r.json()).then(r=>{if(!r.success)throw Error('History unavailable');setEvents(r.data)}).catch(e=>setError(e.message))},[id]);return <section className="bg-white rounded-xl border p-5"><h2 className="text-xl font-semibold">Case history</h2>{error&&<p role="alert">{error}</p>}<ol>{events.map(e=><li key={e.id} className="border-b py-3"><time>{new Date(e.timestamp).toLocaleString()}</time> · {e.action} · {e.actor?.name||'System'}</li>)}</ol>{!events.length&&!error&&<p>No recorded events.</p>}</section>}

@@ -4,7 +4,10 @@ import { Check, ChevronDown, ChevronUp } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const Select = SelectPrimitive.Root
+function Select(props: React.ComponentProps<typeof SelectPrimitive.Root> | LegacySelectProps) {
+ if ('options' in props) return <LegacySelect {...props}/>
+ return <SelectPrimitive.Root {...props}/>
+}
 
 const SelectGroup = SelectPrimitive.Group
 
@@ -167,7 +170,8 @@ export interface LegacySelectProps extends React.SelectHTMLAttributes<HTMLSelect
 
 export const LegacySelect = React.forwardRef<HTMLSelectElement, LegacySelectProps>(
   ({ className, label, error, options, id, onChange, ...props }, ref) => {
-    const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`
+    const generatedId = React.useId()
+    const selectId = id || generatedId
 
   return (
     <div className="w-full">

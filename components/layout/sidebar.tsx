@@ -16,9 +16,11 @@ import {
 import { Button } from '@/components/ui/button'
 
 const navigation = [
+  { name: 'Reports', href: '/export', icon: FileText, roles: ['PRINCIPAL'] },
+  { name: 'Profile', href: '/profile', icon: Users, roles: ['PRINCIPAL','TEACHER','COUNSELLOR','ADMIN'] },
   { name: 'Dashboard', href: '/', icon: LayoutDashboard, roles: ['PRINCIPAL', 'TEACHER', 'COUNSELLOR', 'ADMIN'] },
-  { name: 'Cases', href: '/cases', icon: FileText, roles: ['PRINCIPAL', 'TEACHER', 'COUNSELLOR', 'ADMIN'] },
-  { name: 'Students', href: '/students', icon: Users, roles: ['PRINCIPAL', 'TEACHER', 'COUNSELLOR', 'ADMIN'] },
+  { name: 'Cases', href: '/cases', icon: FileText, roles: ['PRINCIPAL', 'TEACHER', 'COUNSELLOR'] },
+  { name: 'Students', href: '/students', icon: Users, roles: ['PRINCIPAL', 'TEACHER', 'COUNSELLOR'] },
   { name: 'Staff', href: '/users', icon: Shield, roles: ['PRINCIPAL', 'ADMIN'] },
   { name: 'Audit Log', href: '/audit-log', icon: ClipboardList, roles: ['PRINCIPAL', 'ADMIN'] },
   { name: 'Settings', href: '/settings', icon: Settings, roles: ['PRINCIPAL', 'ADMIN'] },
@@ -39,7 +41,7 @@ export function Sidebar() {
   }
 
   return (
-    <div className="flex h-full w-64 flex-col bg-white border-r border-slate-200">
+    <div className="flex h-full w-48 md:w-64 flex-col bg-white border-r border-slate-200">
       <div className="flex h-16 items-center border-b border-slate-200 px-6">
         <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">SDMS</h1>
       </div>

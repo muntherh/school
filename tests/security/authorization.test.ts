@@ -88,16 +88,16 @@ describe('Authorization Security Tests', () => {
       expect(hasPermission('PRINCIPAL', 'canExport')).toBe(true)
     })
 
-    it('should allow admins to create users', () => {
-      expect(hasPermission('ADMIN', 'canCreateUser')).toBe(true)
+    it('should deny technical admins permission to create users', () => {
+      expect(hasPermission('ADMIN', 'canCreateUser')).toBe(false)
     })
 
-    it('should allow admins to approve users', () => {
-      expect(hasPermission('ADMIN', 'canApproveUser')).toBe(true)
+    it('should deny technical admins permission to approve users', () => {
+      expect(hasPermission('ADMIN', 'canApproveUser')).toBe(false)
     })
 
-    it('should allow admins to export data', () => {
-      expect(hasPermission('ADMIN', 'canExport')).toBe(true)
+    it('should deny technical admins permission to export data', () => {
+      expect(hasPermission('ADMIN', 'canExport')).toBe(false)
     })
   })
 

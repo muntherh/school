@@ -11,11 +11,13 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useAuth } from '@/hooks/use-auth'
 import { api } from '@/lib/api-client'
 import { Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function CasesPage() {
   const router = useRouter()
+  const { user: currentUser } = useAuth()
   const [cases, setCases] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filters, setFilters] = useState({
@@ -42,6 +44,7 @@ export default function CasesPage() {
         limit: pagination.limit.toString(),
       }
 
+      if (filters.search) params.search = filters.search
       if (filters.status) params.status = filters.status
       if (filters.category) params.category = filters.category
 
@@ -92,10 +95,10 @@ export default function CasesPage() {
             </h1>
             <p className="text-muted-foreground mt-1">View and manage disciplinary cases</p>
           </div>
-          <Button onClick={() => router.push('/cases/new')} className="shadow-lg shadow-primary/25">
+          {['PRINCIPAL','TEACHER'].includes(currentUser?.role || '') && <Button onClick={() => router.push('/cases/new')} className="shadow-lg shadow-primary/25">
             <Filter className="w-4 h-4 mr-2" />
             New Case
-          </Button>
+          </Button>}
         </div>
 
         {/* Filters */}
@@ -121,17 +124,21 @@ export default function CasesPage() {
                 <Label>Status</Label>
                 <Select
                   value={filters.status}
-                  onValueChange={(value) => handleFilterChange('status', value)}
+                  onValueChange={(value) => handleFilterChange('status', value === 'all' ? '' : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All Statuses" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Statuses</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="SUBMITTED">Submitted</SelectItem>
                     <SelectItem value="UNDER_REVIEW">Under Review</SelectItem>
                     <SelectItem value="CLARIFICATION_REQUIRED">Clarification Required</SelectItem>
                     <SelectItem value="ASSIGNED">Assigned</SelectItem>
+                    <SelectItem value="ACTION_PENDING">Action Pending</SelectItem>
+                    <SelectItem value="FOLLOW_UP_PENDING">Follow-up Pending</SelectItem>
+                    <SelectItem value="REOPENED">Reopened</SelectItem>
+                    <SelectItem value="REJECTED">Rejected</SelectItem>
                     <SelectItem value="CLOSED">Closed</SelectItem>
                   </SelectContent>
                 </Select>
@@ -140,13 +147,13 @@ export default function CasesPage() {
                 <Label>Category</Label>
                 <Select
                   value={filters.category}
-                  onValueChange={(value) => handleFilterChange('category', value)}
+                  onValueChange={(value) => handleFilterChange('category', value === 'all' ? '' : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All Categories" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     <SelectItem value="Behavioral Issue">Behavioral Issue</SelectItem>
                     <SelectItem value="Academic Dishonesty">Academic Dishonesty</SelectItem>
                     <SelectItem value="Attendance Issue">Attendance Issue</SelectItem>

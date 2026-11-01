@@ -16,7 +16,7 @@ export class AuditService {
     try {
       await prisma.auditEvent.create({
         data: {
-          actorId: data.actorId,
+          actorId: data.actorId === 'anonymous' ? null : data.actorId,
           action: data.action,
           targetType: data.targetType,
           targetId: data.targetId,

@@ -25,7 +25,7 @@ export default function HomePage() {
       } else if (user?.role === 'COUNSELLOR') {
         router.push('/dashboard/counsellor')
       } else if (user?.role === 'ADMIN') {
-        router.push('/dashboard/principal')
+        router.push('/users')
       }
     }
   }, [isLoading, isAuthenticated, user, router])

@@ -1,3 +1,6 @@
+import { requireActiveSession } from '@/lib/session'
+import { AuditService } from '@/services/audit.service'
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { StudentService } from '@/services/student.service'
 import { successResponse, errorResponse } from '@/lib/api-response'
@@ -8,6 +11,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const { id } = await params
     const student = await StudentService.getStudentById(id)
 
@@ -28,10 +33,13 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const { id } = await params
     const body = await request.json()
     const student = await StudentService.updateStudent(id, body)
 
+    await AuditService.logEvent({actorId:(await requireActiveSession()).userId!,action:'STUDENT_UPDATED',targetType:'STUDENT',targetId:id})
     return NextResponse.json(successResponse(student))
   } catch (error: any) {
     console.error('Update student error:', error)

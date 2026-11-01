@@ -1,5 +1,6 @@
 'use client'
 
+import { useAuth } from '@/hooks/use-auth'
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
@@ -11,6 +12,7 @@ import { api } from '@/lib/api-client'
 import { ArrowLeft, Save } from 'lucide-react'
 
 export default function DisciplinaryActionPage() {
+  const { user } = useAuth()
   const params = useParams()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
@@ -28,7 +30,7 @@ export default function DisciplinaryActionPage() {
     setIsLoading(true)
 
     try {
-      const response = await api.createDisciplinaryAction(params.id as string, formData)
+      const response = await api.createDisciplinaryAction(params.id as string, { actionType: formData.actionType, rationale: formData.description, startDate: formData.effectiveDate, responsibleUserId: user?.id })
       if (response.success) {
         router.push(`/cases/${params.id}`)
       } else {

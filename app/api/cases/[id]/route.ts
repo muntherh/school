@@ -1,4 +1,7 @@
+import { AuditService } from '@/services/audit.service'
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
+import { requireActiveSession } from '@/lib/session'
 import { CaseService } from '@/services/case.service'
 import { successResponse, errorResponse } from '@/lib/api-response'
 
@@ -8,6 +11,8 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const { id } = await params
     const caseData = await CaseService.getCaseById(id)
 
@@ -15,6 +20,8 @@ export async function GET(
       return NextResponse.json(errorResponse('NOT_FOUND', 'Case not found'), { status: 404 })
     }
 
+    const session = await requireActiveSession()
+    if (session.role === 'TEACHER') caseData.interventions = []
     return NextResponse.json(successResponse(caseData))
   } catch (error: any) {
     console.error('Get case error:', error)
@@ -28,10 +35,14 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const { id } = await params
     const body = await request.json()
     const caseData = await CaseService.updateCase(id, body)
 
+    const session = await requireActiveSession()
+    await AuditService.logEvent({actorId:(await requireActiveSession()).userId!,action:'CASE_UPDATED',targetType:'CASE',targetId:id})
     return NextResponse.json(successResponse(caseData))
   } catch (error: any) {
     console.error('Update case error:', error)

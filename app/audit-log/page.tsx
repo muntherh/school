@@ -119,7 +119,7 @@ export default function AuditLogPage() {
                     <SelectValue placeholder="All Actions" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Actions</SelectItem>
+                    <SelectItem value="all">All Actions</SelectItem>
                     <SelectItem value="CASE_CREATED">Case Created</SelectItem>
                     <SelectItem value="CASE_UPDATED">Case Updated</SelectItem>
                     <SelectItem value="CASE_STATUS_CHANGED">Status Changed</SelectItem>
@@ -142,7 +142,7 @@ export default function AuditLogPage() {
                     <SelectValue placeholder="All Types" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all">All Types</SelectItem>
                     <SelectItem value="CASE">Case</SelectItem>
                     <SelectItem value="USER">User</SelectItem>
                     <SelectItem value="STUDENT">Student</SelectItem>

@@ -1,3 +1,4 @@
+import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { AuthService } from '@/services/auth.service'
 import { createUserSchema, updateUserStatusSchema } from '@/lib/validation'
@@ -8,6 +9,8 @@ import { AuditService } from '@/services/audit.service'
 // GET /api/users - List all users (Principal/Admin only)
 export async function GET(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withPermission(request, 'canViewAllUsers')
     
     if (!auth) {
@@ -64,6 +67,8 @@ export async function GET(request: NextRequest) {
 // POST /api/users - Create a new user (Principal/Admin only)
 export async function POST(request: NextRequest) {
   try {
+    const denied = await routeAccess(request)
+    if (denied) return denied
     const auth = await withPermission(request, 'canCreateUser')
     
     if (!auth) {
@@ -93,7 +98,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(successResponse(user), { status: 201 })
   } catch (error: any) {
     if (error.name === 'ZodError') {
-      return NextResponse.json(errorResponse('VALIDATION_ERROR', 'Invalid input data', error.errors), { status: 400 })
+      return NextResponse.json(errorResponse('VALIDATION_ERROR', 'Invalid input data', error.issues), { status: 400 })
     }
     console.error('Create user error:', error)
     return NextResponse.json(errorResponse('INTERNAL_ERROR', error.message || 'Failed to create user'), { status: 400 })
