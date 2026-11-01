@@ -170,7 +170,8 @@ export interface LegacySelectProps extends React.SelectHTMLAttributes<HTMLSelect
 
 export const LegacySelect = React.forwardRef<HTMLSelectElement, LegacySelectProps>(
   ({ className, label, error, options, id, onChange, ...props }, ref) => {
-    const selectId = React.useId()
+    const generatedId = React.useId()
+    const selectId = id || generatedId
 
   return (
     <div className="w-full">
