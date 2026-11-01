@@ -6,9 +6,10 @@ Implemented: restored dependency manifest/scripts; source-tree cleanup; PostgreS
 
 ## Verification
 
-- Local TypeScript and 62 unit tests passed.
-- GitHub Actions at b5d8b46a215657f6b834f30dfe74d16ce97c06eb: PostgreSQL migration, TypeScript, 173 unit/integration/security tests and production build passed. Four of five browser tests passed; the remaining test exposed explicit input IDs being discarded, now corrected.
-- Subsequent code adds a first-principal bootstrap regression test (174 non-browser tests total). Final CI results are recorded below after completion.
+- Verified application commit: `496dfa9fc2abdaa51cb554e1df3cee5b0e56ae79`.
+- [GitHub Actions run 41264182754](https://github.com/muntherh/school/actions/runs/41264182754) completed successfully: clean install, PostgreSQL 16 migration, Prisma generation, TypeScript, **174 unit/integration/security tests**, production Next.js build, and **5 Playwright browser tests**.
+- Local TypeScript and 62 unit tests also passed. Earlier browser failures exposed discarded explicit field IDs and an insufficient wait for first-route development compilation; both were fixed before the successful run.
+- The subsequent documentation commit only records these results; no application or test code changed after the verified commit.
 - npm audit after the scoped deepmerge-ts 8.0.0 override reported zero known vulnerabilities. This is a dependency advisory check, not a security certification.
 - Browser tests cover login, own-case access, principal review/closure through the form, role-based denials, audit redaction and session invalidation after deactivation. They are a bounded regression suite, not full school acceptance.
 
