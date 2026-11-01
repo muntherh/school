@@ -43,7 +43,7 @@ export class CaseWorkflowService {
     // Fetch current case with version for optimistic locking
     const currentCase = await prisma.case.findUnique({
       where: { id: caseId },
-      include: { student: true, reporter: true },
+      include: { student: true, reporter: { select: { id: true, name: true, role: true } } },
     })
 
     if (!currentCase) {
@@ -83,7 +83,7 @@ export class CaseWorkflowService {
     const updatedCase = await prisma.case.update({
       where: { id: caseId, version: currentCase.version },
       data: updateData,
-      include: { student: true, reporter: true },
+      include: { student: true, reporter: { select: { id: true, name: true, role: true } } },
     })
 
     // Log audit event
@@ -126,7 +126,7 @@ export class CaseWorkflowService {
       where: { id: input.assignedToId },
     })
 
-    if (!assignedUser || assignedUser.accountStatus !== 'ACTIVE') {
+    if (!assignedUser || assignedUser.accountStatus !== 'ACTIVE' || assignedUser.role === 'ADMIN') {
       return { success: false, error: 'Assigned user not found or not active' }
     }
 
@@ -139,7 +139,7 @@ export class CaseWorkflowService {
         status: 'ASSIGNED',
         version: { increment: 1 },
       },
-      include: { student: true, reporter: true, assignedTo: true },
+      include: { student: true, reporter: { select: { id: true, name: true, role: true } }, assignedTo: { select: { id: true, name: true, role: true } } },
     })
 
     // Log audit event
@@ -236,7 +236,7 @@ export class CaseWorkflowService {
         status: 'SUBMITTED',
         version: { increment: 1 },
       },
-      include: { student: true, reporter: true },
+      include: { student: true, reporter: { select: { id: true, name: true, role: true } } },
     })
 
     // Log audit event
@@ -264,70 +264,51 @@ export class CaseWorkflowService {
     actorId: string,
     assignedToId?: string
   ): Promise<TransitionResult> {
-    const currentCase = await prisma.case.findUnique({
-      where: { id: caseId },
-    })
-
-    if (!currentCase) {
-      return { success: false, error: 'Case not found' }
+    if (!['APPROVED', 'REJECTED', 'CLOSED'].includes(decision) || !rationale.trim()) {
+      return { success: false, error: 'A valid decision and rationale are required' }
     }
-
-    // Create review with decision
-    const review = await prisma.caseReview.create({
-      data: {
-        caseId,
-        reviewerId: actorId,
-        result: decision,
-        notes: rationale,
-      },
-    })
-
-    // Determine next status based on decision
-    let newStatus: CaseStatusCode = 'UNDER_REVIEW'
-    if (decision === 'APPROVED') {
-      newStatus = assignedToId ? 'ASSIGNED' : 'ACTION_PENDING'
-    } else if (decision === 'REJECTED') {
-      newStatus = 'REJECTED'
-    } else if (decision === 'CLOSED') {
-      newStatus = 'CLOSED'
-    }
-
-    // Transition status
-    const transitionResult = await this.transitionStatus(
-      caseId,
-      newStatus,
-      actorId,
-      'PRINCIPAL',
-      rationale,
-      currentCase.version
-    )
-
-    // If assigned to someone, perform assignment
-    if (assignedToId && newStatus === 'ASSIGNED') {
-      await this.assignCase({
-        caseId,
-        assignedToId,
-        assignedBy: actorId,
-        rationale,
+    try {
+      return await prisma.$transaction(async (tx) => {
+        const actor = await tx.user.findUnique({ where: { id: actorId } })
+        if (actor?.role !== 'PRINCIPAL' || actor.accountStatus !== 'ACTIVE') {
+          return { success: false, error: 'Only an active principal can record a decision' }
+        }
+        const currentCase = await tx.case.findUnique({ where: { id: caseId } })
+        if (!currentCase) return { success: false, error: 'Case not found' }
+        if (['DRAFT', 'CLOSED', 'REJECTED'].includes(currentCase.status)) {
+          return { success: false, error: 'Case must be open for a decision' }
+        }
+        if (assignedToId) {
+          const assignee = await tx.user.findUnique({ where: { id: assignedToId } })
+          if (decision !== 'APPROVED' || !assignee || assignee.accountStatus !== 'ACTIVE' || assignee.role === 'ADMIN') {
+            return { success: false, error: 'Assignment requires approval and an active school staff member' }
+          }
+        }
+        const newStatus: CaseStatusCode = decision === 'APPROVED' ? (assignedToId ? 'ASSIGNED' : 'ACTION_PENDING') : decision === 'CLOSED' ? 'CLOSED' : 'REJECTED'
+        // Closing without further action is an explicit principal decision with rationale;
+        // it is deliberately distinct from the generic status-transition shortcut.
+        const review = await tx.caseReview.create({ data: { caseId, reviewerId: actorId, result: decision, notes: rationale } })
+        const updatedCase = await tx.case.update({
+          where: { id: caseId, version: currentCase.version },
+          data: {
+            status: newStatus, version: { increment: 1 },
+            ...(assignedToId ? { assignedToId, assignedAt: new Date() } : {}),
+            ...(decision === 'CLOSED' ? { closedAt: new Date(), closedBy: actorId } : {}),
+          },
+          include: { student: true, reporter: { select: { id: true, name: true, role: true } }, assignedTo: { select: { id: true, name: true, role: true } } },
+        })
+        await tx.auditEvent.create({ data: {
+          actorId, action: 'CASE_DECISION_RECORDED', targetType: 'Case', targetId: caseId,
+          metadata: { decision, rationale, assignedToId: assignedToId || null, reviewId: review.id, fromStatus: currentCase.status, toStatus: newStatus },
+        } })
+        return { success: true, case: updatedCase }
       })
+    } catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') {
+        return { success: false, error: 'Case was modified by another user. Please refresh and try again.' }
+      }
+      throw error
     }
-
-    // Log audit event
-    await AuditService.logEvent({
-      actorId,
-      action: 'CASE_DECISION_RECORDED',
-      targetType: 'Case',
-      targetId: caseId,
-      metadata: {
-        decision,
-        rationale,
-        assignedToId,
-        reviewId: review.id,
-        referenceNumber: currentCase.referenceNumber,
-      },
-    })
-
-    return transitionResult
   }
 
   /**

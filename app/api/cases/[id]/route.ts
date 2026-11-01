@@ -1,3 +1,4 @@
+import { AuditService } from '@/services/audit.service'
 import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { requireActiveSession } from '@/lib/session'
@@ -41,6 +42,7 @@ export async function PATCH(
     const caseData = await CaseService.updateCase(id, body)
 
     const session = await requireActiveSession()
+    await AuditService.logEvent({actorId:(await requireActiveSession()).userId!,action:'CASE_UPDATED',targetType:'CASE',targetId:id})
     return NextResponse.json(successResponse(caseData))
   } catch (error: any) {
     console.error('Update case error:', error)

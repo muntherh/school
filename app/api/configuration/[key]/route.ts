@@ -55,6 +55,7 @@ export async function PATCH(
 
     const { key } = await params
     const body = await request.json()
+    if (!['INCIDENT_CATEGORIES','ACTION_TYPES','INTERVENTION_TYPES'].includes(key) || !Array.isArray(body.value) || body.value.length > 100 || body.value.some((v:unknown) => typeof v !== 'string' || !v.trim() || v.length > 200)) return NextResponse.json(errorResponse('VALIDATION_ERROR','Expected a non-empty category list'),{status:400})
     
     const configuration = await prisma.configuration.update({
       where: { key },

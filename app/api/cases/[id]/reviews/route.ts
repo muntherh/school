@@ -1,5 +1,6 @@
 import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
+import { CaseWorkflowService } from '@/lib/workflow/case-workflow'
 import { CaseReviewService } from '@/services/case-review.service'
 import { successResponse, errorResponse } from '@/lib/api-response'
 import { withAuth, authErrorResponse, permissionErrorResponse } from '@/lib/middleware'
@@ -51,6 +52,14 @@ export async function POST(
     const { id } = await params
     const body = await request.json()
     
+    if (['APPROVED', 'REJECTED', 'CLOSED'].includes(body.result)) {
+      if (typeof body.notes !== 'string' || !body.notes.trim()) {
+        return NextResponse.json(errorResponse('VALIDATION_ERROR', 'Decision rationale is required'), { status: 400 })
+      }
+      const result = await CaseWorkflowService.recordDecision(id, body.result, body.notes, auth.user.id, body.assignedToId)
+      return NextResponse.json(result.success ? successResponse(result.case) : errorResponse('DECISION_FAILED', result.error || 'Decision failed'), { status: result.success ? 201 : 400 })
+    }
+
     const review = await CaseReviewService.createReview({
       ...body,
       caseId: id,

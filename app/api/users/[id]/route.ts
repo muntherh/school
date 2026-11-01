@@ -1,3 +1,5 @@
+import { requireActiveSession } from '@/lib/session'
+import { AuditService } from '@/services/audit.service'
 import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { AuthService } from '@/services/auth.service'
@@ -40,6 +42,7 @@ export async function PATCH(
 
     const user = await AuthService.updateUser(id, validatedData)
 
+    await AuditService.logEvent({actorId:(await requireActiveSession()).userId!,action:'USER_UPDATED',targetType:'USER',targetId:id})
     return NextResponse.json(successResponse(user))
   } catch (error: any) {
     if (error.name === 'ZodError') {

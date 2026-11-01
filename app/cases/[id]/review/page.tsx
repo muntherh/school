@@ -71,8 +71,8 @@ export default function CaseReviewPage() {
                 onChange={(e) => handleChange('result', e.target.value)}
                 options={[
                   { value: '', label: 'Select result' },
-                  { value: 'APPROVED', label: 'Approve - Proceed to Assignment' },
-                  { value: 'REJECTED', label: 'Reject - Request Clarification' },
+                  { value: 'APPROVED', label: 'Approve - Action Required' },
+                  { value: 'REJECTED', label: 'Reject Case' },
                   { value: 'CLOSED', label: 'Close - No Further Action' },
                 ]}
                 required

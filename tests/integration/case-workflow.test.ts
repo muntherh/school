@@ -374,6 +374,20 @@ describe('Case Workflow Service', () => {
       expect(result.case?.assignedToId).toBe(counsellorId)
     })
 
+    it('does not leave reviews or assignments after an invalid decision', async () => {
+      const result = await CaseWorkflowService.recordDecision(caseId, 'APPROVED', 'Assign', principalId, 'missing-user')
+      expect(result.success).toBe(false)
+      expect(await prisma.caseReview.count({ where: { caseId } })).toBe(0)
+      expect((await prisma.case.findUnique({ where: { id: caseId } }))?.status).toBe('SUBMITTED')
+    })
+
+    it('rejects decisions by a teacher', async () => {
+      const record = await prisma.case.findUniqueOrThrow({ where: { id: caseId } })
+      const result = await CaseWorkflowService.recordDecision(caseId, 'CLOSED', 'Close', record.reporterId)
+      expect(result.success).toBe(false)
+      expect(await prisma.caseReview.count({ where: { caseId } })).toBe(0)
+    })
+
     it('should close case when decision is CLOSED', async () => {
       const result = await CaseWorkflowService.recordDecision(
         caseId,

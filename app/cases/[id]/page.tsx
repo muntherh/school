@@ -1,4 +1,5 @@
 'use client'
+import { CaseHistory } from '@/components/case-history'
 import { CompleteFollowUp } from '@/components/complete-follow-up'
 
 import { useEffect, useState } from 'react'
@@ -162,6 +163,7 @@ export default function CaseDetailsPage() {
   return (
     <DashboardLayout>
       <div className="space-y-8">
+        <CaseHistory id={caseData.id}/>
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
@@ -203,7 +205,7 @@ export default function CaseDetailsPage() {
               </div>
               <div className="bg-slate-50 p-4 rounded-lg">
                 <p className="text-sm font-medium text-slate-600 mb-1">Reported On</p>
-                <p className="text-lg font-semibold text-slate-900">{new Date(caseData.createdAt).toLocaleDateString()}</p>
+                <p className="text-lg font-semibold text-slate-900">{new Date(caseData.submittedAt).toLocaleDateString()}</p>
               </div>
               <div className="md:col-span-2 bg-slate-50 p-4 rounded-lg">
                 <p className="text-sm font-medium text-slate-600 mb-2">Description</p>
@@ -355,8 +357,8 @@ export default function CaseDetailsPage() {
                   <TableBody>
                     {reviews.map((review) => (
                       <TableRow key={review.id} className="hover:bg-slate-50 transition-colors">
-                        <TableCell className="text-slate-900">{new Date(review.createdAt).toLocaleDateString()}</TableCell>
-                        <TableCell className="text-slate-600">{review.reviewerName}</TableCell>
+                        <TableCell className="text-slate-900">{new Date(review.reviewDate).toLocaleDateString()}</TableCell>
+                        <TableCell className="text-slate-600">{review.reviewer?.name}</TableCell>
                         <TableCell>
                           <Badge variant={review.result === 'APPROVED' ? 'success' : 'warning'} className={review.result === 'APPROVED' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}>
                             {review.result}
@@ -472,9 +474,9 @@ export default function CaseDetailsPage() {
                             {followUp.status}{['PRINCIPAL','COUNSELLOR'].includes(user?.role||'') && ['PENDING','OVERDUE'].includes(followUp.status) && <CompleteFollowUp id={followUp.id} onComplete={() => window.location.reload()}/>} 
                           </Badge>
                         </TableCell>
-                        <TableCell className="text-slate-600">{followUp.notes}</TableCell>
+                        <TableCell className="text-slate-600">{followUp.nextStep}</TableCell>
                         <TableCell className="text-slate-600">
-                          {followUp.completedAt ? new Date(followUp.completedAt).toLocaleDateString() : '-'}
+                          {followUp.completionDate ? new Date(followUp.completionDate).toLocaleDateString() : '-'}
                         </TableCell>
                       </TableRow>
                     ))}

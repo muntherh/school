@@ -1,3 +1,5 @@
+import { requireActiveSession } from '@/lib/session'
+import { AuditService } from '@/services/audit.service'
 import { routeAccess } from '@/lib/route-access'
 import { NextRequest, NextResponse } from 'next/server'
 import { FollowUpService } from '@/services/follow-up.service'
@@ -37,6 +39,7 @@ export async function PATCH(
     const body = await request.json()
     const followUp = await FollowUpService.updateFollowUp(id, body)
 
+    await AuditService.logEvent({actorId:(await requireActiveSession()).userId!,action:'FOLLOW_UP_UPDATED',targetType:'FOLLOW_UP',targetId:id})
     return NextResponse.json(successResponse(followUp))
   } catch (error: any) {
     console.error('Update follow-up error:', error)
