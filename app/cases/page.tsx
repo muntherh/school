@@ -11,11 +11,13 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useAuth } from '@/hooks/use-auth'
 import { api } from '@/lib/api-client'
 import { Search, Filter, ChevronLeft, ChevronRight } from 'lucide-react'
 
 export default function CasesPage() {
   const router = useRouter()
+  const { user: currentUser } = useAuth()
   const [cases, setCases] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filters, setFilters] = useState({
@@ -93,10 +95,10 @@ export default function CasesPage() {
             </h1>
             <p className="text-muted-foreground mt-1">View and manage disciplinary cases</p>
           </div>
-          <Button onClick={() => router.push('/cases/new')} className="shadow-lg shadow-primary/25">
+          {['PRINCIPAL','TEACHER'].includes(currentUser?.role || '') && <Button onClick={() => router.push('/cases/new')} className="shadow-lg shadow-primary/25">
             <Filter className="w-4 h-4 mr-2" />
             New Case
-          </Button>
+          </Button>}
         </div>
 
         {/* Filters */}

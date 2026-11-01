@@ -10,11 +10,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useAuth } from '@/hooks/use-auth'
 import { api } from '@/lib/api-client'
 import { Search, Filter, Plus, User } from 'lucide-react'
 
 export default function StudentsPage() {
   const router = useRouter()
+  const { user: currentUser } = useAuth()
   const [students, setStudents] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filters, setFilters] = useState({
@@ -49,16 +51,7 @@ export default function StudentsPage() {
     }
   }
 
-  const getStatusBadge = (activeStatus: string) => {
-    const variants: Record<string, any> = {
-      ACTIVE: { variant: 'success', label: 'Active' },
-      INACTIVE: { variant: 'default', label: 'Inactive' },
-      GRADUATED: { variant: 'info', label: 'Graduated' },
-      TRANSFERRED: { variant: 'warning', label: 'Transferred' },
-    }
-    const config = variants[activeStatus] || { variant: 'gray', label: activeStatus }
-    return <Badge variant={config.variant}>{config.label}</Badge>
-  }
+  const getStatusBadge = (activeStatus: boolean) => <Badge variant={activeStatus ? 'success' : 'gray'}>{activeStatus ? 'Active' : 'Inactive'}</Badge>
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -72,10 +65,10 @@ export default function StudentsPage() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Students</h1>
             <p className="text-slate-600 mt-1">Search and view student information</p>
           </div>
-          <Button onClick={() => router.push('/students/new')} className="shadow-lg shadow-emerald-500/25">
+          {currentUser?.role === 'PRINCIPAL' && <Button onClick={() => router.push('/students/new')} className="shadow-lg shadow-emerald-500/25">
             <Plus className="mr-2 h-4 w-4" />
             Add Student
-          </Button>
+          </Button>}
         </div>
 
         {/* Filters */}
@@ -113,17 +106,15 @@ export default function StudentsPage() {
                 <Label>Status</Label>
                 <Select
                   value={filters.activeStatus}
-                  onValueChange={(value) => handleFilterChange('activeStatus', value)}
+                  onValueChange={(value) => handleFilterChange('activeStatus', value === 'all' ? '' : value)}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="All Statuses" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Statuses</SelectItem>
-                    <SelectItem value="ACTIVE">Active</SelectItem>
-                    <SelectItem value="INACTIVE">Inactive</SelectItem>
-                    <SelectItem value="GRADUATED">Graduated</SelectItem>
-                    <SelectItem value="TRANSFERRED">Transferred</SelectItem>
+                    <SelectItem value="true">Active</SelectItem>
+                    <SelectItem value="false">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
               </div>

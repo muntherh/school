@@ -38,7 +38,6 @@ export async function PATCH(
       targetId: id,
       metadata: { 
         newStatus: validatedData.status,
-        previousStatus: user.accountStatus,
         approver: auth.user.name 
       },
       ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,

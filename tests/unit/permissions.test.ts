@@ -98,9 +98,9 @@ describe('Permissions', () => {
   })
 
   describe('canExportData', () => {
-    it('should allow principal and admin to export', () => {
+    it('should allow principal export and deny technical admin export', () => {
       expect(canExportData('PRINCIPAL')).toBe(true)
-      expect(canExportData('ADMIN')).toBe(true)
+      expect(canExportData('ADMIN')).toBe(false)
     })
 
     it('should deny teacher and counsellor export', () => {
@@ -140,10 +140,8 @@ describe('Permissions', () => {
       expect(fields).toContain('decision')
     })
 
-    it('should return extended fields for admin', () => {
-      const fields = getExportFields('ADMIN')
-      expect(fields).toContain('description')
-      expect(fields).toContain('decision')
+    it('should expose no export fields to technical admin', () => {
+      expect(getExportFields('ADMIN')).toEqual([])
     })
 
     it('should return base fields for teacher', () => {

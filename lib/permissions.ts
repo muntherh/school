@@ -97,8 +97,8 @@ export const ROLE_PERMISSIONS: Record<
     canConfigure: false,
   },
   ADMIN: {
-    canCreateUser: true,
-    canApproveUser: true,
+    canCreateUser: false,
+    canApproveUser: false,
     canViewAllUsers: true,
     canViewOwnProfile: true,
     canUpdateOwnProfile: true,
@@ -114,7 +114,7 @@ export const ROLE_PERMISSIONS: Record<
     canCreateIntervention: false,
     canViewConfidentialNotes: false,
     canCreateFollowUp: false,
-    canExport: true,
+    canExport: false,
     canViewAuditLog: true,
     canConfigure: true,
   },
@@ -240,6 +240,7 @@ export function canConfigureSystem(userRole: UserRole): boolean {
  * Get allowed fields for export based on role
  */
 export function getExportFields(userRole: UserRole): string[] {
+  if (userRole === 'ADMIN') return []
   const baseFields = [
     'referenceNumber',
     'studentId',
@@ -267,7 +268,7 @@ export function getExportFields(userRole: UserRole): string[] {
   ]
 
   // Principal and Admin get extended fields
-  if (userRole === 'PRINCIPAL' || userRole === 'ADMIN') {
+  if (userRole === 'PRINCIPAL') {
     return [...baseFields, ...extendedFields]
   }
 

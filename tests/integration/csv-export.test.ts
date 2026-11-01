@@ -230,7 +230,7 @@ describe('CSV Export Authorization Tests', () => {
   })
 
   describe('Admin Export Permissions', () => {
-    it('should allow admin to export data', async () => {
+    it('should deny technical admin export of data', async () => {
       const options: ExportOptions = {
         filters: {},
         fields: ['referenceNumber', 'studentName', 'status'],
@@ -241,11 +241,11 @@ describe('CSV Export Authorization Tests', () => {
 
       const result = await CSVExportService.exportCases(options)
 
-      expect(result.success).toBe(true)
-      expect(result.csv).toBeDefined()
+      expect(result.success).toBe(false)
+      expect(result.csv).toBeUndefined()
     })
 
-    it('should allow admin to export extended fields', async () => {
+    it('should deny technical admin export of extended fields', async () => {
       const options: ExportOptions = {
         filters: {},
         fields: ['referenceNumber', 'studentName', 'description', 'witnesses', 'decision'],
@@ -256,7 +256,7 @@ describe('CSV Export Authorization Tests', () => {
 
       const result = await CSVExportService.exportCases(options)
 
-      expect(result.success).toBe(true)
+      expect(result.success).toBe(false)
     })
   })
 
@@ -286,12 +286,8 @@ describe('CSV Export Authorization Tests', () => {
       expect(principalFields).not.toContain('confidentialNotes')
     })
 
-    it('should grant admins extended field access', () => {
-      const adminFields = CSVExportService['getAllowedFields']('ADMIN', false)
-      
-      expect(adminFields).toContain('description')
-      expect(adminFields).toContain('witnesses')
-      expect(adminFields).toContain('decision')
+    it('should expose no export fields to technical admin', () => {
+      expect(CSVExportService['getAllowedFields']('ADMIN', false)).toEqual([])
     })
 
     it('should not grant admins confidential field access by default', () => {
@@ -316,11 +312,8 @@ describe('CSV Export Authorization Tests', () => {
       expect(stats.totalCount).toBe(2)
     })
 
-    it('should allow admins to see all cases', async () => {
-      const stats = await CSVExportService.getExportStats({}, adminId, 'ADMIN')
-      
-      // Admin should see both cases
-      expect(stats.totalCount).toBe(2)
+    it('should deny technical admin case statistics', async () => {
+      await expect(CSVExportService.getExportStats({}, adminId, 'ADMIN')).rejects.toThrow('cannot access')
     })
   })
 

@@ -10,11 +10,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { useAuth } from '@/hooks/use-auth'
 import { api } from '@/lib/api-client'
 import { Search, Filter, Plus, Shield, CheckCircle, Clock, XCircle } from 'lucide-react'
 
 export default function UsersPage() {
   const router = useRouter()
+  const { user: currentUser } = useAuth()
   const [users, setUsers] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [filters, setFilters] = useState({
@@ -97,10 +99,10 @@ export default function UsersPage() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Staff Management</h1>
             <p className="text-slate-600 mt-1">Manage staff accounts and approvals</p>
           </div>
-          <Button onClick={() => router.push('/users/new')} className="shadow-lg shadow-emerald-500/25">
+          {currentUser?.role === 'PRINCIPAL' && <Button onClick={() => router.push('/users/new')} className="shadow-lg shadow-emerald-500/25">
             <Plus className="mr-2 h-4 w-4" />
             Add Staff
-          </Button>
+          </Button>}
         </div>
 
         {/* Filters */}
@@ -199,7 +201,7 @@ export default function UsersPage() {
                       <TableCell>{getStatusBadge(user.accountStatus)}</TableCell>
                       <TableCell>
                         <div className="flex items-center space-x-2">
-                          {user.accountStatus === 'PENDING' && (
+                          {currentUser?.role === 'PRINCIPAL' && user.accountStatus === 'PENDING' && (
                             <>
                               <Button
                                 variant="ghost"
@@ -217,7 +219,7 @@ export default function UsersPage() {
                               </Button>
                             </>
                           )}
-                          {user.accountStatus === 'ACTIVE' && (
+                          {currentUser?.role === 'PRINCIPAL' && user.accountStatus === 'ACTIVE' && (
                             <Button
                               variant="ghost"
                               size="sm"
@@ -226,7 +228,7 @@ export default function UsersPage() {
                               Deactivate
                             </Button>
                           )}
-                          {user.accountStatus === 'DEACTIVATED' && (
+                          {currentUser?.role === 'PRINCIPAL' && user.accountStatus === 'DEACTIVATED' && (
                             <Button
                               variant="ghost"
                               size="sm"

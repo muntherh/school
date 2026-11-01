@@ -91,6 +91,7 @@ export class CSVExportService {
    * Get allowed fields for user role
    */
   private static getAllowedFields(userRole: UserRole, includeConfidential: boolean): string[] {
+    if (userRole === 'ADMIN') return []
     const baseFields = [
       'referenceNumber',
       'studentId',
@@ -126,7 +127,7 @@ export class CSVExportService {
     let fields = [...baseFields]
 
     // Principal and Admin get extended fields
-    if (userRole === 'PRINCIPAL' || userRole === 'ADMIN') {
+    if (userRole === 'PRINCIPAL') {
       fields = [...fields, ...extendedFields]
     }
 
@@ -179,7 +180,7 @@ export class CSVExportService {
     }
 
     // Reporter filter (Principal/Admin only)
-    if (filters.reporterId && (userRole === 'PRINCIPAL' || userRole === 'ADMIN')) {
+    if (filters.reporterId && (userRole === 'PRINCIPAL')) {
       where.reporterId = filters.reporterId
     }
 
@@ -359,13 +360,14 @@ export class CSVExportService {
    * Check if user can export data
    */
   private static canExport(userRole: UserRole): boolean {
-    return userRole === 'PRINCIPAL' || userRole === 'ADMIN'
+    return userRole === 'PRINCIPAL'
   }
 
   /**
    * Get export statistics
    */
   static async getExportStats(filters: ExportFilters, userId: string, userRole: UserRole) {
+    if (userRole === 'ADMIN') throw new Error('Technical administrators cannot access case statistics')
     const where = this.buildWhereClause(filters, userId, userRole)
 
     const totalCount = await prisma.case.count({ where })
