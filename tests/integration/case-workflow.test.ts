@@ -337,6 +337,7 @@ describe('Case Workflow Service', () => {
       })
 
       expect(result.success).toBe(false)
+      expect(await prisma.caseReview.count({ where: { caseId } })).toBe(0)
     })
   })
 

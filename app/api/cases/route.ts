@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const filters = {
+      search: searchParams.get('search') || undefined,
       assignedToId: auth.user.role === 'COUNSELLOR' ? auth.user.id : undefined,
       status: searchParams.get('status') || undefined,
       studentId: searchParams.get('studentId') || undefined,

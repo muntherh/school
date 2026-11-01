@@ -1,6 +1,5 @@
 import { prisma } from '@/lib/prisma'
 import { canTransitionStatus, CASE_STATUS_TRANSITIONS, CaseStatusCode } from '@/lib/permissions'
-import { AuditService } from '@/services/audit.service'
 import { Prisma } from '@prisma/client'
 
 export interface TransitionResult {
@@ -29,6 +28,14 @@ export interface ClarificationResponseInput {
 }
 
 export class CaseWorkflowService {
+  private static async transaction(fn: (tx: Prisma.TransactionClient) => Promise<TransitionResult>): Promise<TransitionResult> {
+    try { return await prisma.$transaction(fn) }
+    catch (error) {
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2025') return { success: false, error: 'Case was modified by another user. Please refresh and try again.' }
+      throw error
+    }
+  }
+
   /**
    * Transition case status with validation and audit logging
    */
@@ -41,7 +48,8 @@ export class CaseWorkflowService {
     currentVersion?: number
   ): Promise<TransitionResult> {
     // Fetch current case with version for optimistic locking
-    const currentCase = await prisma.case.findUnique({
+    return this.transaction(async (tx) => {
+    const currentCase = await tx.case.findUnique({
       where: { id: caseId },
       include: { student: true, reporter: { select: { id: true, name: true, role: true } } },
     })
@@ -80,14 +88,14 @@ export class CaseWorkflowService {
     }
 
     // Perform transition
-    const updatedCase = await prisma.case.update({
+    const updatedCase = await tx.case.update({
       where: { id: caseId, version: currentCase.version },
       data: updateData,
       include: { student: true, reporter: { select: { id: true, name: true, role: true } } },
     })
 
     // Log audit event
-    await AuditService.logEvent({
+    await tx.auditEvent.create({ data: {
       actorId,
       action: 'CASE_STATUS_TRANSITION',
       targetType: 'Case',
@@ -98,16 +106,18 @@ export class CaseWorkflowService {
         rationale,
         referenceNumber: currentCase.referenceNumber,
       },
-    })
+    } })
 
     return { success: true, case: updatedCase }
+    })
   }
 
   /**
    * Assign case to a staff member
    */
   static async assignCase(input: CaseAssignmentInput): Promise<TransitionResult> {
-    const currentCase = await prisma.case.findUnique({
+    return this.transaction(async (tx) => {
+    const currentCase = await tx.case.findUnique({
       where: { id: input.caseId },
     })
 
@@ -122,7 +132,7 @@ export class CaseWorkflowService {
     }
 
     // Verify assigned user exists and is active
-    const assignedUser = await prisma.user.findUnique({
+    const assignedUser = await tx.user.findUnique({
       where: { id: input.assignedToId },
     })
 
@@ -131,8 +141,8 @@ export class CaseWorkflowService {
     }
 
     // Update case
-    const updatedCase = await prisma.case.update({
-      where: { id: input.caseId },
+    const updatedCase = await tx.case.update({
+      where: { id: input.caseId, version: currentCase.version },
       data: {
         assignedToId: input.assignedToId,
         assignedAt: new Date(),
@@ -143,7 +153,7 @@ export class CaseWorkflowService {
     })
 
     // Log audit event
-    await AuditService.logEvent({
+    await tx.auditEvent.create({ data: {
       actorId: input.assignedBy,
       action: 'CASE_ASSIGNED',
       targetType: 'Case',
@@ -155,68 +165,34 @@ export class CaseWorkflowService {
         rationale: input.rationale,
         referenceNumber: currentCase.referenceNumber,
       },
-    })
+    } })
 
     return { success: true, case: updatedCase }
+    })
   }
 
   /**
    * Request clarification from reporter
    */
   static async requestClarification(input: ClarificationRequestInput): Promise<TransitionResult> {
-    const currentCase = await prisma.case.findUnique({
-      where: { id: input.caseId },
+    return this.transaction(async (tx) => {
+      const currentCase = await tx.case.findUnique({ where: { id: input.caseId } })
+      if (!currentCase) return { success: false, error: 'Case not found' }
+      if (!canTransitionStatus(currentCase.status, 'CLARIFICATION_REQUIRED', 'PRINCIPAL')) return { success: false, error: 'Invalid status transition' }
+      if (typeof input.clarificationRequest !== 'string' || !input.clarificationRequest.trim() || input.clarificationRequest.length > 2000) return { success: false, error: 'Clarification request is required (maximum 2000 characters)' }
+      const review = await tx.caseReview.create({ data: { caseId: input.caseId, reviewerId: input.requestedBy, result: 'CLARIFICATION_REQUIRED', clarificationRequest: input.clarificationRequest } })
+      const record = await tx.case.update({ where: { id: input.caseId, version: currentCase.version }, data: { status: 'CLARIFICATION_REQUIRED', version: { increment: 1 } } })
+      await tx.auditEvent.create({ data: { actorId: input.requestedBy, action: 'CLARIFICATION_REQUESTED', targetType: 'Case', targetId: input.caseId, metadata: { reviewId: review.id, referenceNumber: record.referenceNumber } } })
+      return { success: true, case: record }
     })
-
-    if (!currentCase) {
-      return { success: false, error: 'Case not found' }
-    }
-
-    // Create clarification request as a review
-    const review = await prisma.caseReview.create({
-      data: {
-        caseId: input.caseId,
-        reviewerId: input.requestedBy,
-        result: 'CLARIFICATION_REQUIRED',
-        clarificationRequest: input.clarificationRequest,
-      },
-    })
-
-    // Transition case status
-    const transitionResult = await this.transitionStatus(
-      input.caseId,
-      'CLARIFICATION_REQUIRED',
-      input.requestedBy,
-      'PRINCIPAL',
-      input.clarificationRequest,
-      currentCase.version
-    )
-
-    if (!transitionResult.success) {
-      return transitionResult
-    }
-
-    // Log audit event
-    await AuditService.logEvent({
-      actorId: input.requestedBy,
-      action: 'CLARIFICATION_REQUESTED',
-      targetType: 'Case',
-      targetId: input.caseId,
-      metadata: {
-        clarificationRequest: input.clarificationRequest,
-        reviewId: review.id,
-        referenceNumber: currentCase.referenceNumber,
-      },
-    })
-
-    return transitionResult
   }
 
   /**
    * Respond to clarification request
    */
   static async respondToClarification(input: ClarificationResponseInput): Promise<TransitionResult> {
-    const currentCase = await prisma.case.findUnique({
+    return this.transaction(async (tx) => {
+    const currentCase = await tx.case.findUnique({
       where: { id: input.caseId },
     })
 
@@ -224,13 +200,16 @@ export class CaseWorkflowService {
       return { success: false, error: 'Case not found' }
     }
 
+    if (currentCase.reporterId !== input.respondedBy) return { success: false, error: 'Only the reporter can respond' }
+    if (typeof input.clarificationResponse !== 'string' || !input.clarificationResponse.trim() || input.clarificationResponse.length > 2000) return { success: false, error: 'A clarification response is required (maximum 2000 characters)' }
+
     if (currentCase.status !== 'CLARIFICATION_REQUIRED') {
       return { success: false, error: 'Case is not in clarification required status' }
     }
 
     // Add clarification response to case description or create a note
-    const updatedCase = await prisma.case.update({
-      where: { id: input.caseId },
+    const updatedCase = await tx.case.update({
+      where: { id: input.caseId, version: currentCase.version },
       data: {
         description: `${currentCase.description}\n\n[Clarification Response]: ${input.clarificationResponse}`,
         status: 'SUBMITTED',
@@ -240,7 +219,7 @@ export class CaseWorkflowService {
     })
 
     // Log audit event
-    await AuditService.logEvent({
+    await tx.auditEvent.create({ data: {
       actorId: input.respondedBy,
       action: 'CLARIFICATION_RESPONDED',
       targetType: 'Case',
@@ -249,9 +228,10 @@ export class CaseWorkflowService {
         clarificationResponse: input.clarificationResponse,
         referenceNumber: currentCase.referenceNumber,
       },
-    })
+    } })
 
     return { success: true, case: updatedCase }
+    })
   }
 
   /**

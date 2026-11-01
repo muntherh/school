@@ -32,6 +32,8 @@ export async function GET(request: NextRequest) {
     }
 
     const result = await AuditService.getAuditLog(filters)
+    // Technical administration does not grant access to counselling/case content.
+    if (auth.user.role === 'ADMIN') result.events = result.events.map(event => ({ ...event, metadata: null }))
 
     return NextResponse.json({ success: true, data: result })
   } catch (error: any) {

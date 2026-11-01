@@ -11,6 +11,8 @@ export interface SessionData {
   isLoggedIn?: boolean
 }
 
+if (process.env.NODE_ENV === 'production' && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32 || /^(replace-|default-secret)/i.test(process.env.SESSION_SECRET))) throw new Error('Set a random production SESSION_SECRET of at least 32 characters')
+
 const sessionTTL = Number(process.env.SESSION_MAX_AGE || '28800')
 if (!Number.isInteger(sessionTTL) || sessionTTL < 60 || sessionTTL > 86400) throw new Error('SESSION_MAX_AGE must be between 60 and 86400 seconds')
 export const sessionOptions = {

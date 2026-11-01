@@ -15,6 +15,7 @@ export class CaseService {
    * Get cases with filters and pagination
    */
   static async getCases(filters: {
+    search?: string
     status?: string
     studentId?: string
     assignedToId?: string
@@ -32,6 +33,7 @@ export class CaseService {
       const skip = (page - 1) * limit
 
       const where: any = {}
+      if (validatedFilters.search) where.OR = [{ referenceNumber: { contains: validatedFilters.search, mode: 'insensitive' } }, { description: { contains: validatedFilters.search, mode: 'insensitive' } }]
       if (validatedFilters.assignedToId) where.assignedToId = validatedFilters.assignedToId
 
       if (validatedFilters.status) {

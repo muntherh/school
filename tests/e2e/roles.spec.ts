@@ -48,6 +48,9 @@ test('teacher signs in, opens own case, and cannot read another case or interven
   expect(own.status()).toBe(200)
   expect(await own.text()).not.toContain('Sensitive intervention text')
   expect((await page.request.get(`/api/cases/${otherCaseId}`)).status()).toBe(403)
+  const search = await page.request.get('/api/cases?search=Unrelated%20incident')
+  expect(search.status()).toBe(200)
+  expect((await search.json()).data).toEqual([])
   expect((await page.request.get(`/api/cases/${caseId}/interventions`)).status()).toBe(403)
   expect((await page.request.post(`/api/cases/${caseId}/reviews`, { data: { result: 'CLOSED', notes: 'Not permitted' } })).status()).toBe(403)
 })
@@ -78,6 +81,12 @@ test('technical admin cannot access case content and deactivation invalidates se
   await login(page.request, 'admin')
   expect((await page.request.get(`/api/cases/${caseId}`)).status()).toBe(403)
   expect((await page.request.get('/api/export/cases')).status()).toBe(403)
+  await db.auditEvent.create({ data: { actorId: users.principal.id, action: 'CASE_TEST', targetType: 'Case', targetId: caseId, metadata: { notes: 'must-not-reach-technical-admin' } } })
+  for (const endpoint of ['/api/audit', '/api/audit-log']) {
+    const audit = await page.request.get(endpoint)
+    expect(audit.status()).toBe(200)
+    expect(await audit.text()).not.toContain('must-not-reach-technical-admin')
+  }
   await db.user.update({ where: { id: users.admin.id }, data: { accountStatus: 'DEACTIVATED' } })
   expect((await page.request.get('/api/users')).status()).toBe(401)
 })

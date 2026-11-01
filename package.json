@@ -56,7 +56,8 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration tests/security",
     "test:e2e": "playwright test",
-    "db:seed": "node prisma/seed.js"
+    "db:seed": "node prisma/seed.js",
+    "admin:create": "node --env-file-if-exists=.env prisma/bootstrap-principal.js"
   },
   "prisma": {
     "seed": "node prisma/seed.js"

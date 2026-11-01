@@ -42,6 +42,7 @@ export default function CasesPage() {
         limit: pagination.limit.toString(),
       }
 
+      if (filters.search) params.search = filters.search
       if (filters.status) params.status = filters.status
       if (filters.category) params.category = filters.category
 
@@ -132,6 +133,10 @@ export default function CasesPage() {
                     <SelectItem value="UNDER_REVIEW">Under Review</SelectItem>
                     <SelectItem value="CLARIFICATION_REQUIRED">Clarification Required</SelectItem>
                     <SelectItem value="ASSIGNED">Assigned</SelectItem>
+                    <SelectItem value="ACTION_PENDING">Action Pending</SelectItem>
+                    <SelectItem value="FOLLOW_UP_PENDING">Follow-up Pending</SelectItem>
+                    <SelectItem value="REOPENED">Reopened</SelectItem>
+                    <SelectItem value="REJECTED">Rejected</SelectItem>
                     <SelectItem value="CLOSED">Closed</SelectItem>
                   </SelectContent>
                 </Select>

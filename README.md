@@ -9,7 +9,10 @@ Use Node.js 22 or newer and PostgreSQL 16 or newer.
 ```sh
 git clone https://github.com/muntherh/school.git
 cd school
+git checkout codex/sdms-repair
 npm ci
+# Optional: start the local PostgreSQL service
+docker compose up -d db
 cp .env.example .env
 # Set DATABASE_URL and a random SESSION_SECRET of at least 32 characters.
 npx prisma generate
@@ -38,7 +41,7 @@ npm run build
 npm run test:e2e
 ```
 
-Test fixtures delete data exclusively in the selected _test database. GitHub Actions provisions an isolated PostgreSQL service. Playwright covers login rendering and anonymous API rejection; this is not a full acceptance suite.
+Test fixtures delete data exclusively in the selected _test database. GitHub Actions provisions an isolated PostgreSQL service. Playwright covers login, own-case access, principal closure through the review form, role denials, technical-admin audit redaction and session deactivation. It does not replace school acceptance of every workflow.
 
 ## Access policy
 
@@ -47,3 +50,9 @@ Teachers access their own reports. Counsellors access assigned cases. Principals
 ## Operations
 
 Use HTTPS, managed secrets, restricted DB credentials, encrypted backups and a shared ingress login rate limiter. The application includes a per-process login limiter; it is not a distributed limiter. Schedule pg_dump backups and test pg_restore on a separate database before a pilot. The hosting provider, school retention policy, counselling-note access approval and backup destination remain deployment decisions.
+
+## First real principal
+
+After applying migrations to an empty production database, set `BOOTSTRAP_EMAIL`, `BOOTSTRAP_NAME`, `BOOTSTRAP_STAFF_ID` and `BOOTSTRAP_PASSWORD` (12 or more characters) through the host secret manager, then run `npm run admin:create`. The command refuses to run if an active principal already exists, creates no demo student records and records an audit event. Remove the bootstrap secrets afterward. The principal can add and approve other staff through Staff Management.
+
+The `deepmerge-ts` override under `@prisma/config` uses 8.0.0 to address GHSA-ggr8-5vv4-36mx without changing the Prisma major version. Prisma generation, migrations and the application checks are exercised by CI.

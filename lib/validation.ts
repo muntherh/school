@@ -166,6 +166,7 @@ export const exportCasesSchema = z.object({
 
 // Query parameter schemas
 export const caseFilterSchema = z.object({
+  search: z.string().trim().max(200).optional(),
   assignedToId: z.string().uuid().optional(),
   status: CaseStatusEnum.optional(),
   studentId: z.string().uuid().optional(),
