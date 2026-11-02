@@ -11,9 +11,9 @@ export const school = {
   city: 'Sohar, Sultanate of Oman',
   phone: '26 750862',
   phoneHref: 'tel:+96826750862',
-  // Website shown on the school's entrance sign; the Google Maps listing uses fsisoman.edu.om.
-  website: 'oloummustaqbal-school.com',
-  websiteHref: 'https://www.oloummustaqbal-school.com',
+  // Official website confirmed by the school (the entrance sign also shows oloummustaqbal-school.com).
+  website: 'fsisoman.edu.om',
+  websiteHref: 'https://fsisoman.edu.om/',
   curriculum: 'British Curriculum · FS1 to Year 11',
   licence: 'Licence No. 70',
   portalName: 'Student Conduct Portal',
