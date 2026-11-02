@@ -60,9 +60,6 @@
     "db:seed": "node prisma/seed.js",
     "admin:create": "node --env-file-if-exists=.env prisma/bootstrap-principal.js"
   },
-  "prisma": {
-    "seed": "node prisma/seed.js"
-  },
   "overrides": {
     "@prisma/config": {
       "deepmerge-ts": "8.0.0"
