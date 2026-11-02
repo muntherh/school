@@ -76,9 +76,10 @@ export class DisciplinaryActionService {
     responsibleUserId: string
   }) {
     try {
-      // Extract caseId and responsibleUserId before validation
-      const { caseId, responsibleUserId, ...actionData } = data
+      // responsibleUserId is part of the validated schema, so only caseId is separated out
+      const { caseId, ...actionData } = data
       const validatedData = createDisciplinaryActionSchema.parse(actionData)
+      const responsibleUserId = validatedData.responsibleUserId
 
       // Verify case exists
       const caseExists = await prisma.case.findUnique({

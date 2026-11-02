@@ -1,6 +1,8 @@
 import { expect } from 'vitest'
 function needsDatabase() { return !expect.getState().testPath?.includes('/unit/') }
-if (process.env.DATABASE_URL && !new URL(process.env.DATABASE_URL).pathname.endsWith('_test')) throw new Error('Tests require a dedicated database whose name ends with _test')
+// Unit tests never touch the database, so a developer .env pointing at a local
+// database must not block them. Database-backed suites still require a _test database.
+if (needsDatabase() && process.env.DATABASE_URL && !new URL(process.env.DATABASE_URL).pathname.endsWith('_test')) throw new Error('Tests require a dedicated database whose name ends with _test')
 import { prisma } from '@/lib/prisma'
 import { beforeAll, afterAll, beforeEach } from 'vitest'
 
