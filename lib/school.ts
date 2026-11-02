@@ -43,4 +43,7 @@ export const school = {
   logoColor: '/images/school-logo-color.png',
   logoWhite: '/images/school-logo-white.png',
   campusImage: '/images/school-campus.jpg',
+  officeImage: '/images/campus-office.jpg',
+  computerLabImage: '/images/campus-computer-lab.jpg',
+  corridorImage: '/images/campus-corridor.jpg',
 }

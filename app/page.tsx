@@ -56,6 +56,13 @@ const commitments = [
   { icon: ScrollText, title: 'Every action is recorded', text: 'Decisions and changes keep their author and time in an audit trail.' },
 ]
 
+const campus = [
+  { src: school.corridorImage, alt: 'Colourful school corridor with a play area', title: 'Colourful corridors', text: 'Cheerful, welcoming spaces between classrooms.', span: 'sm:col-span-2 lg:row-span-2', position: 'object-center' },
+  { src: school.computerLabImage, alt: 'Computer lab with student workstations', title: 'Computer lab', text: 'A workstation for every student.', span: 'sm:col-span-2', position: 'object-center' },
+  { src: school.officeImage, alt: 'School administration office', title: 'Administration', text: 'Where cases are reviewed with care.', span: '', position: 'object-[60%_50%]' },
+  { src: school.campusImage, alt: 'Shaded outdoor play area', title: 'Outdoor play', text: 'Shaded play areas for every age.', span: '', position: 'object-[60%_50%]' },
+]
+
 // The four colours of the school logo, used to tell items apart.
 const brandBg = ['bg-brand-teal', 'bg-brand-orange', 'bg-brand-pink', 'bg-brand-green']
 
@@ -132,6 +139,7 @@ export default function HomePage() {
             <a href="#top" className="rounded-md bg-brand-pink px-3 py-1.5 text-white">Home</a>
             {[
               ['#about', 'About'],
+              ['#campus', 'Campus'],
               ['#process', 'How it works'],
               ['#accreditation', 'Accreditation'],
               ['#contact', 'Contact'],
@@ -248,7 +256,7 @@ export default function HomePage() {
           <Wave fill="#0b1022" back="#20b0c0" />
           <div className="relative bg-navy-950 py-20">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={school.campusImage} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-25" />
+            <img src={school.computerLabImage} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-30" />
             <div aria-hidden className="absolute inset-0 bg-gradient-to-br from-brand-teal/40 via-navy-950/70 to-navy-950" />
             <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
               <SectionTitle eyebrow="Our community" title="A diverse, caring school family" light center />
@@ -265,6 +273,27 @@ export default function HomePage() {
             </div>
           </div>
           <Wave fill="#0b1022" back="#20b0c0" flip />
+        </section>
+
+        {/* Campus gallery */}
+        <section id="campus" className="scroll-mt-24 py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <Reveal><SectionTitle eyebrow="Our campus" title="Bright spaces to learn and grow" center /></Reveal>
+            <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:h-[560px] lg:grid-cols-4 lg:grid-rows-2">
+              {campus.map((c, i) => (
+                <Reveal key={c.title} delay={i * 120} variant="zoom" className={`group relative overflow-hidden rounded-3xl shadow-lg ${c.span}`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={c.src} alt={c.alt} loading="lazy" className={`h-full min-h-[240px] w-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-110 ${c.position}`} />
+                  <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="absolute inset-x-0 bottom-0 p-5 text-white transition-transform duration-500 group-hover:-translate-y-1">
+                    <span className={`mb-2 inline-block h-1.5 w-10 rounded-full ${brandBg[i % brandBg.length]} transition-all duration-500 group-hover:w-16`} />
+                    <p className="text-lg font-extrabold sm:text-xl">{c.title}</p>
+                    <p className="mt-0.5 max-w-sm text-sm text-white/85">{c.text}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* Process */}

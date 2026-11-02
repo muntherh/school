@@ -47,7 +47,7 @@ export default function LoginPage() {
       {/* Brand panel */}
       <section className="relative hidden flex-1 flex-col justify-between overflow-hidden bg-navy-950 p-12 text-white lg:flex xl:p-16">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={school.campusImage} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
+        <img src={school.officeImage} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
         <div aria-hidden className="absolute inset-0 bg-gradient-to-br from-navy-950/95 via-navy-900/90 to-navy-800/70" />
         <Link href="/" className="relative flex items-center gap-3 self-start">
           {/* eslint-disable-next-line @next/next/no-img-element */}
