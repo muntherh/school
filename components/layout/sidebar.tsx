@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/hooks/use-auth'
+import { school } from '@/lib/school'
 import {
   LayoutDashboard,
   FolderOpen,
@@ -32,7 +33,7 @@ const sections: { title: string; items: NavItem[] }[] = [
   {
     title: 'Workspace',
     items: [
-      { name: 'Dashboard', href: '/', icon: LayoutDashboard, roles: ALL, match: (p) => p === '/' || p.startsWith('/dashboard') },
+      { name: 'Dashboard', href: '/portal', icon: LayoutDashboard, roles: ALL, match: (p) => p === '/portal' || p.startsWith('/dashboard') },
       { name: 'Cases', href: '/cases', icon: FolderOpen, roles: ['PRINCIPAL', 'TEACHER', 'COUNSELLOR'] },
       { name: 'Students', href: '/students', icon: GraduationCap, roles: ['PRINCIPAL', 'TEACHER', 'COUNSELLOR'] },
       { name: 'Reports', href: '/export', icon: FileDown, roles: ['PRINCIPAL'] },
@@ -72,8 +73,8 @@ export function initials(name?: string) {
 
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-[0_6px_16px_-6px_rgb(37_99_235/0.6)]', className)}>
-      <ShieldCheck className="h-5 w-5 text-white" strokeWidth={2.25} />
+    <div className={cn('flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-gold-300 to-gold-500 text-navy-950 shadow-[0_6px_16px_-6px_rgb(180_134_25/0.6)] ring-2 ring-white', className)}>
+      <GraduationCap className="h-[55%] w-[55%]" strokeWidth={1.8} />
     </div>
   )
 }
@@ -94,8 +95,8 @@ export function Sidebar({ onNavigate, onClose }: { onNavigate?: () => void; onCl
       <div className="relative flex h-20 items-center gap-3 px-6">
         <BrandMark />
         <div className="leading-tight">
-          <p className="text-[15px] font-bold tracking-tight text-slate-900">SDMS</p>
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">School Discipline</p>
+          <p className="font-serif text-[15px] font-bold tracking-tight text-navy-900">{school.nameShortEn}</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.12em] text-slate-400">Conduct Portal</p>
         </div>
         {onClose && (
           <button onClick={onClose} aria-label="Close navigation" className="ml-auto rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700">

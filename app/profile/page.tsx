@@ -16,7 +16,7 @@ export default function Profile() {
         </div>
 
         <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[var(--shadow-soft)]">
-          <div className="relative h-28 overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500">
+          <div className="relative h-28 overflow-hidden bg-gradient-to-br from-navy-900 via-navy-800 to-blue-700">
             <div aria-hidden className="absolute inset-0 bg-grid-light" />
           </div>
           <div className="px-6 pb-6">
