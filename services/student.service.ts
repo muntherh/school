@@ -6,6 +6,7 @@ export class StudentService {
    * Search students with filters
    */
   static async searchStudents(filters: {
+    query?: string
     studentId?: string
     name?: string
     classGrade?: string
@@ -15,6 +16,14 @@ export class StudentService {
       const validatedFilters = studentFilterSchema.parse(filters)
 
       const where: any = {}
+
+      // Free-text lookup by approved identifier or name (FR-STU-01).
+      if (validatedFilters.query) {
+        where.OR = [
+          { studentId: { contains: validatedFilters.query, mode: 'insensitive' } },
+          { name: { contains: validatedFilters.query, mode: 'insensitive' } },
+        ]
+      }
 
       if (validatedFilters.studentId) {
         where.studentId = { contains: validatedFilters.studentId, mode: 'insensitive' }

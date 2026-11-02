@@ -65,7 +65,7 @@ export default function StudentsPage() {
             <h1 className="page-title">Students</h1>
             <p className="text-slate-600 mt-1">Search and view student information</p>
           </div>
-          {currentUser?.role === 'PRINCIPAL' && <Button onClick={() => router.push('/students/new')} className="shadow-lg shadow-emerald-500/25">
+          {currentUser?.role === 'PRINCIPAL' && <Button onClick={() => router.push('/students/new')} className="shadow-lg shadow-blue-500/25">
             <Plus className="mr-2 h-4 w-4" />
             Add Student
           </Button>}
@@ -131,7 +131,7 @@ export default function StudentsPage() {
           <CardContent>
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-emerald-600" />
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
               </div>
             ) : students.length === 0 ? (
               <div className="text-center py-12">

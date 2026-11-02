@@ -38,7 +38,7 @@ export function CaseHistory({ id }: { id: string }) {
           <li key={e.id} className="relative pl-7">
             <span
               aria-hidden
-              className={`absolute left-0 top-1 h-[15px] w-[15px] rounded-full border-[3px] border-white ring-1 ${i === events.length - 1 ? 'bg-emerald-500 ring-emerald-200' : 'bg-slate-300 ring-slate-200'}`}
+              className={`absolute left-0 top-1 h-[15px] w-[15px] rounded-full border-[3px] border-white ring-1 ${i === events.length - 1 ? 'bg-blue-500 ring-blue-200' : 'bg-slate-300 ring-slate-200'}`}
             />
             <p className="text-sm font-semibold text-slate-800">{humanize(e.action)}</p>
             <p className="mt-0.5 text-xs text-slate-500">

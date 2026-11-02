@@ -11,8 +11,8 @@ export function FullPageLoader() {
     <div className="flex h-screen items-center justify-center bg-background">
       <div className="flex flex-col items-center gap-4">
         <div className="relative h-12 w-12">
-          <div className="absolute inset-0 rounded-full border-4 border-emerald-100" />
-          <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-emerald-500" />
+          <div className="absolute inset-0 rounded-full border-4 border-blue-100" />
+          <div className="absolute inset-0 animate-spin rounded-full border-4 border-transparent border-t-blue-500" />
         </div>
         <p className="text-sm font-medium text-slate-500">Loading…</p>
       </div>
@@ -53,7 +53,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
       {/* Mobile navigation drawer */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true">
-          <div className="absolute inset-0 bg-ink-950/60 backdrop-blur-sm animate-fade-in" onClick={() => setMobileOpen(false)} />
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm animate-fade-in" onClick={() => setMobileOpen(false)} />
           <div className="relative h-full w-72 max-w-[85vw] animate-slide-up shadow-2xl">
             <Sidebar onNavigate={() => setMobileOpen(false)} onClose={() => setMobileOpen(false)} />
           </div>

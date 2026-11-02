@@ -62,7 +62,7 @@ export default function ReopenCasePage() {
                   Reason for Reopening *
                 </label>
                 <textarea
-                  className="flex min-h-[120px] w-full rounded-xl border border-input bg-white px-4 py-3 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 focus:outline-none"
+                  className="flex min-h-[120px] w-full rounded-xl border border-input bg-white px-4 py-3 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 focus:outline-none"
                   placeholder="Explain why this case needs to be reopened..."
                   value={reason}
                   onChange={(e) => setReason(e.target.value)}
@@ -85,7 +85,7 @@ export default function ReopenCasePage() {
                 >
                   Cancel
                 </Button>
-                <Button type="submit" isLoading={isLoading} className="shadow-lg shadow-emerald-500/25">
+                <Button type="submit" isLoading={isLoading} className="shadow-lg shadow-blue-500/25">
                   <RotateCcw className="mr-2 h-4 w-4" />
                   Reopen Case
                 </Button>

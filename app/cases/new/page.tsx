@@ -7,139 +7,201 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Select } from '@/components/ui/select'
-import { api } from '@/lib/api-client'
-import { ArrowLeft, Save } from 'lucide-react'
+import { StudentPicker, type PickedStudent } from '@/components/student-picker'
+import { api, ApiError } from '@/lib/api-client'
+import { AlertTriangle, ArrowLeft, Save, ShieldAlert } from 'lucide-react'
+
+const textareaClass =
+  'flex min-h-[130px] w-full rounded-xl border border-input bg-white px-4 py-3 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 focus:outline-none'
 
 export default function NewCasePage() {
   const router = useRouter()
   const [categories, setCategories] = useState<string[]>([])
-  useEffect(() => { fetch('/api/configuration/INCIDENT_CATEGORIES').then(r=>r.json()).then(r=>{if(r.success) setCategories(r.data.value)}) }, [])
+  const [student, setStudent] = useState<PickedStudent | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [duplicateWarning, setDuplicateWarning] = useState('')
   const [formData, setFormData] = useState({
-    studentId: '',
     category: '',
     incidentDate: new Date().toISOString().split('T')[0],
+    incidentTime: '',
     location: '',
     description: '',
     witnesses: '',
+    immediateSafetyConcern: false,
   })
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError('')
-    setIsLoading(true)
+  useEffect(() => {
+    fetch('/api/configuration/INCIDENT_CATEGORIES')
+      .then((r) => r.json())
+      .then((r) => { if (r.success) setCategories(r.data.value) })
+      .catch(() => {})
+  }, [])
 
+  const submit = async (confirmDuplicate = false) => {
+    setError('')
+    if (!student) {
+      setError('Choose the student this incident is about.')
+      return
+    }
+    if (formData.description.trim().length < 10) {
+      setError('Description must be at least 10 characters.')
+      return
+    }
+    setIsLoading(true)
     try {
-      const response = await api.createCase(formData)
+      const payload = {
+        studentId: student.id,
+        category: formData.category,
+        incidentDate: formData.incidentDate,
+        ...(formData.incidentTime ? { incidentTime: new Date(`${formData.incidentDate}T${formData.incidentTime}`).toISOString() } : {}),
+        location: formData.location || undefined,
+        witnesses: formData.witnesses || undefined,
+        description: formData.description,
+        immediateSafetyConcern: formData.immediateSafetyConcern,
+        ...(confirmDuplicate ? { confirmDuplicate: true } : {}),
+      }
+      const response = await api.createCase(payload)
       if (response.success && response.data) {
-        const data = response.data as { id: string }
-        router.push(`/cases/${data.id}`)
+        router.push(`/cases/${(response.data as { id: string }).id}`)
       } else {
         setError(response.error?.message || 'Failed to create case')
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred')
+      if (err instanceof ApiError && err.code === 'DUPLICATE_SUSPECTED') {
+        setDuplicateWarning(err.message)
+      } else {
+        setError(err.message || 'An error occurred')
+      }
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
+  const handleChange = (field: string, value: string | boolean) => {
+    setFormData((prev) => ({ ...prev, [field]: value }))
+    setDuplicateWarning('')
   }
 
   return (
     <DashboardLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => router.push('/cases')}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-            <div>
-              <h1 className="page-title">Submit Incident Report</h1>
-              <p className="text-slate-600 mt-1">Create a new disciplinary case</p>
-            </div>
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" onClick={() => router.push('/cases')}>
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <div>
+            <h1 className="page-title">Submit Incident Report</h1>
+            <p className="mt-1 text-sm text-slate-500">A report records what was observed. It is reviewed by the principal before any decision.</p>
           </div>
         </div>
 
-        <Card className="border-slate-200 shadow-lg">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-800">Incident Details</CardTitle>
-            <CardDescription className="text-slate-500">Provide details about the incident</CardDescription>
+            <CardTitle>Incident Details</CardTitle>
+            <CardDescription>Fields marked * are required.</CardDescription>
           </CardHeader>
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <Input
-                label="Student ID"
-                placeholder="Enter student ID (e.g., STU001)"
-                value={formData.studentId}
-                onChange={(e) => handleChange('studentId', e.target.value)}
-                required
-              />
+            <form
+              onSubmit={(e) => { e.preventDefault(); submit(false) }}
+              className="space-y-6"
+            >
+              <StudentPicker value={student} onChange={(s) => { setStudent(s); setDuplicateWarning('') }} />
 
-              <Select
-                label="Category"
-                value={formData.category}
-                onChange={(e) => handleChange('category', e.target.value)}
-                options={[{value:'',label:'Select category'}, ...categories.map(value=>({value,label:value}))]}
-                required
-              />
-
-              <Input
-                label="Incident Date"
-                type="date"
-                value={formData.incidentDate}
-                onChange={(e) => handleChange('incidentDate', e.target.value)}
-                required
-              />
+              <div className="grid gap-6 sm:grid-cols-3">
+                <Select
+                  label="Category *"
+                  value={formData.category}
+                  onChange={(e) => handleChange('category', e.target.value)}
+                  options={[{ value: '', label: 'Select category' }, ...categories.map((value) => ({ value, label: value }))]}
+                  required
+                />
+                <Input
+                  label="Incident Date *"
+                  type="date"
+                  max={new Date().toISOString().split('T')[0]}
+                  value={formData.incidentDate}
+                  onChange={(e) => handleChange('incidentDate', e.target.value)}
+                  required
+                />
+                <Input
+                  label="Incident Time"
+                  type="time"
+                  value={formData.incidentTime}
+                  onChange={(e) => handleChange('incidentTime', e.target.value)}
+                />
+              </div>
 
               <Input
                 label="Location"
                 placeholder="Where did the incident occur?"
+                maxLength={255}
                 value={formData.location}
                 onChange={(e) => handleChange('location', e.target.value)}
               />
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="incident-description" className="mb-1.5 block text-sm font-medium text-slate-700">
                   Description *
                 </label>
                 <textarea
-                  className="flex min-h-[120px] w-full rounded-xl border border-input bg-white px-4 py-3 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 focus:outline-none"
-                  placeholder="Describe the incident in detail..."
+                  id="incident-description"
+                  className={textareaClass}
+                  placeholder="Describe what you observed: what happened, who was involved and what was said or done."
+                  maxLength={5000}
                   value={formData.description}
                   onChange={(e) => handleChange('description', e.target.value)}
                   required
                 />
+                <p className="mt-1.5 text-xs text-slate-500">At least 10 characters. {formData.description.length}/5000</p>
               </div>
 
               <Input
                 label="Witnesses"
                 placeholder="Names of any witnesses (optional)"
+                maxLength={2000}
                 value={formData.witnesses}
                 onChange={(e) => handleChange('witnesses', e.target.value)}
               />
 
+              <label htmlFor="safety-concern" className="flex cursor-pointer items-start gap-3 rounded-xl border border-amber-200 bg-amber-50/60 p-4">
+                <input
+                  id="safety-concern"
+                  type="checkbox"
+                  checked={formData.immediateSafetyConcern}
+                  onChange={(e) => handleChange('immediateSafetyConcern', e.target.checked)}
+                  className="mt-0.5 h-4 w-4 rounded border-amber-300 accent-amber-600"
+                />
+                <span>
+                  <span className="flex items-center gap-1.5 text-sm font-semibold text-amber-900">
+                    <ShieldAlert className="h-4 w-4" /> Immediate safety concern
+                  </span>
+                  <span className="text-sm text-amber-800">Tick if a student or staff member may be at risk. The case is highlighted for the principal.</span>
+                </span>
+              </label>
+
+              {duplicateWarning && (
+                <div role="alert" className="flex flex-col gap-3 rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between">
+                  <span className="flex items-start gap-2"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />{duplicateWarning}</span>
+                  <Button type="button" size="sm" variant="outline" onClick={() => submit(true)} disabled={isLoading}>
+                    Submit as a separate incident
+                  </Button>
+                </div>
+              )}
+
               {error && (
-                <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md border border-red-200">
+                <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
                   {error}
                 </div>
               )}
 
-              <div className="flex justify-end space-x-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.push('/cases')}
-                  disabled={isLoading}
-                >
+              <div className="flex justify-end gap-3">
+                <Button type="button" variant="outline" onClick={() => router.push('/cases')} disabled={isLoading}>
                   Cancel
                 </Button>
-                <Button type="submit" isLoading={isLoading} className="shadow-lg shadow-emerald-500/25">
-                  <Save className="mr-2 h-4 w-4" />
+                <Button type="submit" isLoading={isLoading}>
+                  {!isLoading && <Save className="h-4 w-4" />}
                   Submit Report
                 </Button>
               </div>

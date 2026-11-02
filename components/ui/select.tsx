@@ -20,7 +20,7 @@ const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "flex h-11 w-full items-center justify-between rounded-xl border border-input bg-white px-4 py-2 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all hover:border-slate-300 placeholder:text-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      "flex h-11 w-full items-center justify-between rounded-xl border border-input bg-white px-4 py-2 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all hover:border-slate-300 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
       className
     )}
     {...props}
@@ -183,7 +183,7 @@ export const LegacySelect = React.forwardRef<HTMLSelectElement, LegacySelectProp
       <select
         id={selectId}
         className={cn(
-          "flex h-11 w-full appearance-none rounded-xl border border-input bg-white bg-[url(\"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 fill=%27none%27 stroke=%27%2364748b%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m4 6 4 4 4-4%27/%3E%3C/svg%3E\")] bg-[position:right_0.9rem_center] bg-no-repeat pl-4 pr-10 py-2 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all duration-200 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
+          "flex h-11 w-full appearance-none rounded-xl border border-input bg-white bg-[url(\"data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 width=%2716%27 height=%2716%27 fill=%27none%27 stroke=%27%2364748b%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27m4 6 4 4 4-4%27/%3E%3C/svg%3E\")] bg-[position:right_0.9rem_center] bg-no-repeat pl-4 pr-10 py-2 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all duration-200 hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50",
           error && "border-red-500 focus:border-red-500 focus:ring-red-500/20",
           className
         )}

@@ -71,7 +71,7 @@ export default function Settings() {
               }}
             >
               <div className="flex items-start gap-3">
-                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                   <SlidersHorizontal className="h-5 w-5" />
                 </span>
                 <div className="min-w-0">
@@ -94,7 +94,7 @@ export default function Settings() {
                 id={row.key}
                 name="value"
                 spellCheck={false}
-                className="mt-4 w-full flex-1 rounded-xl border border-input bg-slate-50/60 p-4 font-mono text-[13px] leading-relaxed text-slate-800 transition-all hover:border-slate-300 focus:border-emerald-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-emerald-500/15"
+                className="mt-4 w-full flex-1 rounded-xl border border-input bg-slate-50/60 p-4 font-mono text-[13px] leading-relaxed text-slate-800 transition-all hover:border-slate-300 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-500/15"
                 rows={6}
                 defaultValue={JSON.stringify(row.value, null, 2)}
               />

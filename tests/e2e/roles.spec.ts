@@ -61,6 +61,8 @@ test('principal records a closure decision through the review form', async ({ pa
   await page.getByLabel('Review Result').selectOption('CLOSED')
   await page.locator('textarea').fill('Principal verified this synthetic case needs no further action.')
   await page.getByRole('button', { name: 'Submit Review' }).click()
+  // Closing is consequential, so the form asks for explicit confirmation first.
+  await page.getByRole('dialog').getByRole('button', { name: 'Close case' }).click()
   await expect(page).toHaveURL(new RegExp(`/cases/${otherCaseId}$`))
   const record = await db.case.findUniqueOrThrow({ where: { id: otherCaseId }, include: { reviews: true } })
   expect(record.status).toBe('CLOSED')

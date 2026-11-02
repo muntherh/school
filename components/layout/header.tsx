@@ -31,7 +31,7 @@ export function Header({ onMenu }: { onMenu?: () => void }) {
   }
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200/70 bg-white/75 px-4 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 sm:px-6 lg:px-8">
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200 bg-white/90 px-4 backdrop-blur-xl supports-[backdrop-filter]:bg-white/80 sm:px-6 lg:px-8">
       <button
         onClick={onMenu}
         aria-label="Open navigation"
@@ -51,7 +51,7 @@ export function Header({ onMenu }: { onMenu?: () => void }) {
       </div>
 
       {user && (
-        <span className="hidden rounded-full border border-emerald-200/70 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 md:inline-flex">
+        <span className="hidden rounded-full border border-blue-200/70 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 md:inline-flex">
           {roleLabels[user.role] || user.role}
         </span>
       )}
@@ -59,7 +59,7 @@ export function Header({ onMenu }: { onMenu?: () => void }) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button className="flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pl-1 pr-2.5 shadow-sm transition-colors hover:bg-slate-50" aria-label="Account menu">
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-ink-700 to-ink-950 text-xs font-semibold text-white">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-semibold text-white">
               {initials(user?.name)}
             </span>
             <ChevronDown className="h-4 w-4 text-slate-400" />
