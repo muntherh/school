@@ -153,6 +153,68 @@
   }
 }
 
+/* ------------------------------------------------------------------
+   Homepage motion. Elements are only hidden once html.motion-ok is set
+   (by script, and never for prefers-reduced-motion), so content always
+   remains visible without JavaScript.
+   ------------------------------------------------------------------ */
+.motion-ok [data-reveal] {
+  opacity: 0;
+  transition:
+    opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.motion-ok [data-reveal="up"] { transform: translateY(36px); }
+.motion-ok [data-reveal="left"] { transform: translateX(-48px); }
+.motion-ok [data-reveal="right"] { transform: translateX(48px); }
+.motion-ok [data-reveal="zoom"] { transform: scale(0.92); }
+.motion-ok [data-reveal].is-visible { opacity: 1; transform: none; }
+
+/* Hero text entrance (runs on load) */
+@keyframes heroRise {
+  from { opacity: 0; transform: translateY(28px); filter: blur(6px); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+.motion-ok .hero-rise { animation: heroRise 1s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* Slow cinematic zoom on the hero photo */
+@keyframes kenBurns {
+  from { transform: scale(1.12); }
+  to { transform: scale(1); }
+}
+.motion-ok .ken-burns { animation: kenBurns 14s cubic-bezier(0.2, 0.7, 0.2, 1) both; transform-origin: 50% 30%; }
+
+/* Self-drawing squiggle under headings */
+.squiggle path { stroke-dasharray: 1; stroke-dashoffset: 0; }
+.motion-ok .squiggle path { stroke-dashoffset: 1; transition: stroke-dashoffset 1.4s cubic-bezier(0.65, 0, 0.35, 1) 0.2s; }
+.motion-ok .squiggle.is-drawn path { stroke-dashoffset: 0; }
+
+/* Floating decorative blobs */
+@keyframes floatA {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(14px, -18px) scale(1.05); }
+}
+@keyframes floatB {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-16px, 12px) rotate(8deg); }
+}
+.motion-ok .float-a { animation: floatA 9s ease-in-out infinite; }
+.motion-ok .float-b { animation: floatB 11s ease-in-out infinite; }
+
+/* Drifting wave dividers (two layers move at different speeds) */
+@keyframes waveDrift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.wave-track { width: 200%; display: flex; }
+.motion-ok .wave-slow { animation: waveDrift 26s linear infinite; }
+.motion-ok .wave-fast { animation: waveDrift 16s linear infinite reverse; }
+
+/* Accreditation logos */
+.logo-card img { filter: grayscale(1) contrast(0.9); opacity: 0.75; transition: filter 0.4s, opacity 0.4s, transform 0.4s; }
+.logo-card:hover img { filter: none; opacity: 1; transform: scale(1.04); }
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 10px;

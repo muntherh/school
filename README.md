@@ -32,7 +32,13 @@ Screenshots of every page (desktop and mobile), captured from a production build
 
 ## Deploying on Vercel
 
-The project builds without runtime secrets, but the running app refuses to handle sessions until they are set. In Vercel → Project Settings → Environment Variables, add `DATABASE_URL` (PostgreSQL), `SESSION_SECRET` (random, at least 32 characters) and `NEXT_PUBLIC_APP_URL` (the deployment's HTTPS origin), then redeploy. Run `npx prisma migrate deploy` against that database once before the first login.
+The project builds without runtime secrets, but the running app refuses to handle sessions until they are set.
+
+1. Create a Postgres database from Vercel → Storage (for example Neon) and connect it to the project. This adds `DATABASE_URL` and `DATABASE_URL_UNPOOLED`.
+2. In Vercel → Project Settings → Environment Variables add `SESSION_SECRET` (random, at least 32 characters) for Production and Preview. Optionally set `NEXT_PUBLIC_APP_URL` (the HTTPS origin) for **Production only**; login and form requests from other origins are rejected when it is set.
+3. To create the first principal, also add `BOOTSTRAP_EMAIL`, `BOOTSTRAP_NAME`, `BOOTSTRAP_STAFF_ID` and `BOOTSTRAP_PASSWORD` (12+ characters) for Production.
+4. Redeploy. Vercel runs `npm run vercel-build` (`scripts/vercel-build.js`): on production deployments it applies migrations with the direct connection and runs the one-time principal bootstrap; preview deployments never change the database.
+5. After the principal can sign in, delete the `BOOTSTRAP_*` variables.
 
 ## PostgreSQL migration
 

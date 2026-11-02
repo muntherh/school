@@ -52,6 +52,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
+    "vercel-build": "node scripts/vercel-build.js",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
