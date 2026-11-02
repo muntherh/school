@@ -74,7 +74,7 @@ export function initials(name?: string) {
 export function BrandMark({ className }: { className?: string }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={school.logo} alt={`${school.nameEn} logo`} width={512} height={512} className={cn('h-10 w-10 object-contain', className)} />
+    <img src={school.logoColor} alt={`${school.nameEn} logo`} width={512} height={512} className={cn('h-10 w-10 object-contain', className)} />
   )
 }
 

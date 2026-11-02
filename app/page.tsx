@@ -9,6 +9,8 @@ import {
   HeartHandshake,
   LockKeyhole,
   MapPin,
+  Mail,
+  Clock,
   Phone,
   Scale,
   ScrollText,
@@ -55,11 +57,14 @@ const commitments = [
   { icon: ScrollText, title: 'Every action is recorded', text: 'Decisions and changes keep their author and time in an audit trail.' },
 ]
 
+// The four colours of the school logo, used to tell the steps and roles apart.
+const brandBg = ['bg-brand-teal', 'bg-brand-orange', 'bg-brand-pink', 'bg-brand-green']
+
 function SectionTitle({ eyebrow, title, light = false }: { eyebrow: string; title: string; light?: boolean }) {
   return (
     <div>
       <p className={`text-xs font-semibold uppercase tracking-[0.2em] ${light ? 'text-gold-300' : 'text-gold-600'}`}>{eyebrow}</p>
-      <h2 className={`mt-2 font-serif text-3xl font-bold tracking-tight sm:text-4xl ${light ? 'text-white' : 'text-navy-900'}`} style={{ textWrap: 'balance' }}>
+      <h2 className={`mt-2 font-serif text-3xl font-extrabold tracking-tight sm:text-4xl ${light ? 'text-white' : 'text-navy-900'}`} style={{ textWrap: 'balance' }}>
         {title}
       </h2>
     </div>
@@ -76,17 +81,15 @@ function Emblem({ className = '', light = false }: { className?: string; light?:
 export default function HomePage() {
   return (
     <div className="min-h-screen bg-white text-slate-700">
-      {/* Utility bar */}
-      <div className="bg-navy-950 text-[13px] text-slate-300">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center gap-x-5 gap-y-1">
-            <a href={school.phoneHref} className="inline-flex items-center gap-1.5 hover:text-white"><Phone className="h-3.5 w-3.5 text-gold-400" /> {school.phone}</a>
-            <a href={school.websiteHref} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:text-white"><Globe className="h-3.5 w-3.5 text-gold-400" /> {school.website}</a>
-            <span className="hidden items-center gap-1.5 sm:inline-flex"><MapPin className="h-3.5 w-3.5 text-gold-400" /> {school.city}</span>
+      {/* Utility bar (orange, as on fsisoman.edu.om) */}
+      <div className="bg-brand-orange text-[13px] font-bold text-white">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-6 gap-y-1 px-4 py-2.5 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-1">
+            <a href={`mailto:${school.email}`} className="inline-flex items-center gap-1.5 hover:underline"><Mail className="h-4 w-4 text-brand-pink" /> {school.email}</a>
+            <span className="hidden items-center gap-1.5 md:inline-flex"><Clock className="h-4 w-4 text-brand-pink" /> {school.hours}</span>
+            <span className="hidden items-center gap-1.5 sm:inline-flex"><MapPin className="h-4 w-4 text-brand-pink" /> {school.city}</span>
           </div>
-          <Link href="/login" className="hidden rounded bg-gold-400 px-3 py-1 text-xs font-bold uppercase tracking-wide text-navy-950 transition hover:bg-gold-300 sm:inline-block">
-            Staff Portal
-          </Link>
+          <a href={school.phoneHref} className="hidden items-center gap-1.5 hover:underline sm:inline-flex"><Phone className="h-4 w-4 text-brand-pink" /> {school.phone}</a>
         </div>
       </div>
 
@@ -94,20 +97,21 @@ export default function HomePage() {
       <header className="sticky top-0 z-30 border-b border-slate-200 bg-white/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
           <Link href="/" className="flex min-w-0 items-center gap-3">
-            <Emblem className="h-12 w-12 shrink-0" />
-            <div className="min-w-0 leading-tight">
-              <p className="truncate font-serif text-base font-bold text-navy-900 sm:text-lg">{school.nameShortEn}</p>
-              <p className="truncate text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-500">International Private School</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={school.logoColor} alt={`${school.nameEn} logo`} width={384} height={384} className="h-14 w-14 shrink-0 object-contain sm:h-16 sm:w-16" />
+            <div className="min-w-0 text-[15px] font-bold leading-tight text-navy-950 sm:text-lg">
+              <p className="truncate">{school.nameShortEn}</p>
+              <p className="truncate">International Private School</p>
             </div>
           </Link>
-          <nav className="hidden items-center gap-7 text-[13px] font-semibold uppercase tracking-wide text-navy-900 lg:flex" aria-label="Main">
-            <a href="#top" className="border-b-2 border-gold-500 pb-1">Home</a>
-            <a href="#about" className="pb-1 hover:text-gold-600">About</a>
-            <a href="#process" className="pb-1 hover:text-gold-600">How it works</a>
-            <a href="#commitments" className="pb-1 hover:text-gold-600">Commitments</a>
-            <a href="#contact" className="pb-1 hover:text-gold-600">Contact</a>
+          <nav className="hidden items-center gap-1 text-[16px] font-bold text-navy-950 lg:flex" aria-label="Main">
+            <a href="#top" className="rounded-md bg-brand-pink px-3 py-1.5 text-white">Home</a>
+            <a href="#about" className="rounded-md px-3 py-1.5 hover:text-brand-pink">About</a>
+            <a href="#process" className="rounded-md px-3 py-1.5 hover:text-brand-pink">How it works</a>
+            <a href="#commitments" className="rounded-md px-3 py-1.5 hover:text-brand-pink">Commitments</a>
+            <a href="#contact" className="rounded-md px-3 py-1.5 hover:text-brand-pink">Contact</a>
           </nav>
-          <Link href="/login" className="inline-flex shrink-0 items-center gap-2 rounded-md bg-navy-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-navy-800">
+          <Link href="/login" className="inline-flex shrink-0 items-center gap-2 rounded-md bg-brand-pink px-4 py-2 text-[15px] font-bold text-white transition hover:bg-brand-pink-dark">
             Staff Login <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
@@ -118,28 +122,25 @@ export default function HomePage() {
         <section className="relative overflow-hidden bg-navy-950 text-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={school.campusImage} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover object-center" />
-          <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-navy-950/95 via-navy-950/75 to-navy-900/10" />
-          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-transparent to-transparent" />
-          <div className="relative mx-auto max-w-7xl px-4 pb-36 pt-20 sm:px-6 lg:px-8 lg:pb-44 lg:pt-28">
-            <div>
-              <p lang="ar" dir="rtl" className="inline-block font-arabic text-lg font-semibold text-gold-300 sm:text-xl">{school.nameAr}</p>
-              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">{school.curriculum}</p>
-              <h1 className="mt-4 font-serif text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl" style={{ textWrap: 'balance' }}>
-                Guiding Conduct, <span className="text-gold-400">Building Futures</span>
-              </h1>
-              <p className="mt-5 max-w-xl text-base leading-relaxed text-slate-200 sm:text-lg">
-                The {school.portalName} helps our staff report incidents, review them fairly and support every student through counselling and follow-up.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Link href="/login" className="inline-flex items-center gap-2 rounded-md bg-gold-400 px-5 py-3 text-sm font-bold uppercase tracking-wide text-navy-950 shadow-lg shadow-black/20 transition hover:bg-gold-300">
-                  Staff Login <ArrowRight className="h-4 w-4" />
-                </Link>
-                <a href="#process" className="inline-flex items-center gap-2 rounded-md border border-white/40 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-white/10">
-                  How it works <ArrowRight className="h-4 w-4" />
-                </a>
-              </div>
+          <div aria-hidden className="absolute inset-0 bg-black/45" />
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
+          <div className="relative mx-auto flex max-w-4xl flex-col items-center px-4 pb-40 pt-24 text-center sm:px-6 lg:pb-48 lg:pt-32">
+            <p lang="ar" dir="rtl" className="font-arabic text-lg font-semibold text-white/90 sm:text-xl">{school.nameAr}</p>
+            <h1 className="mt-3 text-4xl font-extrabold leading-[1.1] tracking-tight drop-shadow-lg sm:text-6xl lg:text-7xl" style={{ textWrap: 'balance' }}>
+              Welcome to {school.acronym}
+            </h1>
+            <p className="mt-5 max-w-2xl text-lg font-semibold leading-relaxed text-white/95 drop-shadow sm:text-2xl">
+              The {school.portalName} helps our staff report incidents, review them fairly and support every student through counselling and follow-up.
+            </p>
+            <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-white/80">{school.curriculum}</p>
+            <div className="mt-8 flex flex-wrap justify-center gap-3">
+              <Link href="/login" className="inline-flex items-center gap-2 rounded-full bg-brand-orange px-7 py-3.5 text-base font-extrabold text-white shadow-lg shadow-black/25 transition hover:bg-gold-500">
+                Staff Login <ArrowRight className="h-5 w-5" />
+              </Link>
+              <a href="#process" className="inline-flex items-center gap-2 rounded-full border-2 border-white/80 px-7 py-3.5 text-base font-extrabold text-white transition hover:bg-white/10">
+                How it works
+              </a>
             </div>
-
           </div>
         </section>
 
@@ -148,7 +149,7 @@ export default function HomePage() {
           <ul className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-slate-200 bg-slate-200 shadow-xl lg:grid-cols-5 [&>li:last-child]:col-span-2 lg:[&>li:last-child]:col-span-1">
             {highlights.map((h) => (
               <li key={h.title} className="flex items-center gap-3 bg-white p-5">
-                <h.icon className="h-8 w-8 shrink-0 text-navy-800" strokeWidth={1.6} />
+                <h.icon className="h-8 w-8 shrink-0 text-brand-pink" strokeWidth={1.7} />
                 <div>
                   <p className="text-sm font-bold text-navy-900">{h.title}</p>
                   <p className="text-xs text-slate-500">{h.text}</p>
@@ -188,7 +189,7 @@ export default function HomePage() {
                 </span>
               ))}
             </div>
-            <Link href="/login" className="mt-8 inline-flex items-center gap-2 rounded-md bg-navy-900 px-5 py-3 text-sm font-bold uppercase tracking-wide text-white transition hover:bg-navy-800">
+            <Link href="/login" className="mt-8 inline-flex items-center gap-2 rounded-full bg-brand-pink px-6 py-3 text-sm font-extrabold uppercase tracking-wide text-white transition hover:bg-brand-pink-dark">
               Sign in to the portal <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -201,8 +202,10 @@ export default function HomePage() {
             <ol className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {steps.map((s, i) => (
                 <li key={s.title} className="relative rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg">
-                  <span className="absolute right-4 top-4 font-serif text-sm font-bold text-gold-500">Step {i + 1}</span>
-                  <s.icon className="mx-auto h-10 w-10 text-navy-800" strokeWidth={1.5} />
+                  <span className="absolute right-4 top-4 text-sm font-extrabold text-brand-pink">Step {i + 1}</span>
+                  <span className={`mx-auto flex h-14 w-14 items-center justify-center rounded-full text-white ${brandBg[i % brandBg.length]}`}>
+                    <s.icon className="h-7 w-7" strokeWidth={1.8} />
+                  </span>
                   <h3 className="mt-4 font-serif text-lg font-bold text-navy-900">{s.title}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-slate-500">{s.text}</p>
                 </li>
@@ -215,12 +218,11 @@ export default function HomePage() {
         <section className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
           <SectionTitle eyebrow="Who uses the portal" title="One system, the right access for each role" />
           <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {roles.map((r) => (
+            {roles.map((r, i) => (
               <article key={r.title} className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-lg">
-                <div className="relative flex h-32 items-center justify-center bg-gradient-to-br from-navy-900 to-navy-700">
-                  <div aria-hidden className="absolute inset-0 bg-grid-light opacity-40" />
-                  <r.icon className="relative h-12 w-12 text-white/90" strokeWidth={1.4} />
-                  <span className="absolute -bottom-6 left-5 flex h-12 w-12 items-center justify-center rounded-full bg-navy-900 text-gold-300 ring-4 ring-white">
+                <div className={`relative flex h-32 items-center justify-center ${brandBg[i % brandBg.length]}`}>
+                  <r.icon className="relative h-12 w-12 text-white" strokeWidth={1.4} />
+                  <span className="absolute -bottom-6 left-5 flex h-12 w-12 items-center justify-center rounded-full bg-white text-navy-950 shadow-md ring-4 ring-white">
                     <r.icon className="h-5 w-5" />
                   </span>
                 </div>
@@ -259,7 +261,7 @@ export default function HomePage() {
                 <p className="mt-1 text-sm text-slate-300">Accounts are created and approved by the school principal.</p>
               </div>
             </div>
-            <Link href="/login" className="inline-flex items-center gap-2 rounded-md bg-gold-400 px-6 py-3 text-sm font-bold uppercase tracking-wide text-navy-950 transition hover:bg-gold-300">
+            <Link href="/login" className="inline-flex items-center gap-2 rounded-full bg-brand-orange px-6 py-3 text-sm font-extrabold uppercase tracking-wide text-white transition hover:bg-gold-500">
               Sign in <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -291,6 +293,8 @@ export default function HomePage() {
             <ul className="mt-4 space-y-3 text-sm">
               <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 shrink-0 text-gold-400" /> {school.city}</li>
               <li><a href={school.phoneHref} className="flex items-center gap-2 hover:text-white"><Phone className="h-4 w-4 shrink-0 text-gold-400" /> {school.phone}</a></li>
+              <li><a href={`mailto:${school.email}`} className="flex items-center gap-2 break-all hover:text-white"><Mail className="h-4 w-4 shrink-0 text-gold-400" /> {school.email}</a></li>
+              <li className="flex items-start gap-2"><Clock className="mt-0.5 h-4 w-4 shrink-0 text-gold-400" /> {school.hours}</li>
               <li><a href={school.websiteHref} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-white"><Globe className="h-4 w-4 shrink-0 text-gold-400" /> {school.website}</a></li>
             </ul>
           </div>
