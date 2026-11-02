@@ -31,7 +31,20 @@ export default function CasesPage() {
     status: '',
     category: '',
     search: '',
+    classGrade: '',
+    incidentDateFrom: '',
+    incidentDateTo: '',
+    sort: 'newest',
   })
+  const [ready, setReady] = useState(false)
+
+  // Allow dashboard links such as /cases?status=SUBMITTED to open a pre-filtered list.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search)
+    const status = q.get('status')
+    if (status) setFilters((prev) => ({ ...prev, status }))
+    setReady(true)
+  }, [])
   const [pagination, setPagination] = useState({
     page: 1,
     limit: 20,
@@ -40,8 +53,10 @@ export default function CasesPage() {
   })
 
   useEffect(() => {
-    loadCases()
-  }, [filters, pagination.page])
+    if (!ready) return
+    const t = setTimeout(loadCases, filters.search || filters.classGrade ? 250 : 0)
+    return () => clearTimeout(t)
+  }, [filters, pagination.page, ready])
 
   const loadCases = async () => {
     setIsLoading(true)
@@ -54,6 +69,10 @@ export default function CasesPage() {
       if (filters.search) params.search = filters.search
       if (filters.status) params.status = filters.status
       if (filters.category) params.category = filters.category
+      if (filters.classGrade) params.classGrade = filters.classGrade
+      if (filters.incidentDateFrom) params.incidentDateFrom = filters.incidentDateFrom
+      if (filters.incidentDateTo) params.incidentDateTo = filters.incidentDateTo
+      if (filters.sort) params.sort = filters.sort
 
       const response = await api.getCases(params)
       if (response.success && response.data) {
@@ -105,7 +124,7 @@ export default function CasesPage() {
                 <div className="relative">
                   <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                   <Input
-                    placeholder="Search by reference or description..."
+                    placeholder="Student name, ID, reference or description"
                     value={filters.search}
                     onChange={(e) => handleFilterChange('search', e.target.value)}
                     className="pl-10"
@@ -153,6 +172,43 @@ export default function CasesPage() {
                 </Select>
               </div>
             </div>
+            <div className="mt-4 grid gap-4 sm:grid-cols-2 md:grid-cols-4">
+              <div className="space-y-2">
+                <Label htmlFor="filter-class">Class</Label>
+                <Input id="filter-class" placeholder="e.g. 10A" maxLength={50} value={filters.classGrade} onChange={(e) => handleFilterChange('classGrade', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="filter-from">Incident from</Label>
+                <Input id="filter-from" type="date" value={filters.incidentDateFrom} onChange={(e) => handleFilterChange('incidentDateFrom', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="filter-to">Incident to</Label>
+                <Input id="filter-to" type="date" min={filters.incidentDateFrom || undefined} value={filters.incidentDateTo} onChange={(e) => handleFilterChange('incidentDateTo', e.target.value)} />
+              </div>
+              <div className="space-y-2">
+                <Label>Sort by</Label>
+                <Select value={filters.sort} onValueChange={(value) => handleFilterChange('sort', value)}>
+                  <SelectTrigger aria-label="Sort by">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest reports first</SelectItem>
+                    <SelectItem value="oldest">Oldest reports first</SelectItem>
+                    <SelectItem value="incident_desc">Incident date (latest)</SelectItem>
+                    <SelectItem value="incident_asc">Incident date (earliest)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            {(filters.status || filters.category || filters.search || filters.classGrade || filters.incidentDateFrom || filters.incidentDateTo) && (
+              <button
+                type="button"
+                onClick={() => { setFilters({ status: '', category: '', search: '', classGrade: '', incidentDateFrom: '', incidentDateTo: '', sort: filters.sort }); setPagination((p) => ({ ...p, page: 1 })) }}
+                className="mt-4 text-sm font-semibold text-blue-700 hover:text-blue-800"
+              >
+                Clear filters
+              </button>
+            )}
           </CardContent>
         </Card>
 

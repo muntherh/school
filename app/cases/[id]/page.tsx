@@ -31,7 +31,7 @@ function RecordSection({ icon: Icon, title, description, count, children }: { ic
   return (
     <Card>
       <CardHeader className="flex-row items-center gap-3 space-y-0 border-b border-slate-100 pb-5">
-        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+        <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
           <Icon className="h-5 w-5" />
         </span>
         <div className="flex-1">
@@ -161,7 +161,7 @@ export default function CaseDetailsPage() {
   const canRespondToClarification = user?.role === 'TEACHER' && caseData?.status === 'CLARIFICATION_REQUIRED'
 
   const isClosed = caseData?.status === 'CLOSED'
-  const textareaClass = 'flex min-h-[110px] w-full rounded-xl border border-input bg-white px-4 py-3 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 focus:outline-none'
+  const textareaClass = 'flex min-h-[110px] w-full rounded-xl border border-input bg-white px-4 py-3 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/15 focus:outline-none'
 
   if (isLoading) {
     return (
@@ -217,24 +217,23 @@ export default function CaseDetailsPage() {
         </button>
 
         {/* Case header */}
-        <section className="relative overflow-hidden rounded-3xl bg-ink-950 px-6 py-7 text-white shadow-[var(--shadow-lift)] sm:px-8">
-          <div aria-hidden className="absolute inset-0 bg-grid-ink [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)]" />
-          <div aria-hidden className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-emerald-500/20 blur-3xl" />
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-6 py-7 text-white shadow-[var(--shadow-lift)] sm:px-8">
+          <div aria-hidden className="absolute inset-0 bg-grid-light [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">Case file · {caseData.category}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-100">Case file · {caseData.category}</p>
               <h1 className="mt-2 break-all font-mono text-lg font-semibold tracking-tight text-white sm:text-xl">
                 {caseData.referenceNumber}
               </h1>
-              <p className="mt-2 text-sm text-slate-400">
-                Reported by <span className="text-slate-200">{caseData.reporter?.name || '—'}</span> on {fmt(caseData.submittedAt)}
+              <p className="mt-2 text-sm text-blue-100">
+                Reported by <span className="font-semibold text-white">{caseData.reporter?.name || '—'}</span> on {fmt(caseData.submittedAt)}
               </p>
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <StatusBadge status={caseData.status} className="px-3 py-1 text-sm" />
               {caseData.assignedTo && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-sm font-medium text-slate-200">
-                  <UserRound className="h-3.5 w-3.5 text-emerald-300" /> Assigned to {caseData.assignedTo.name}
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/15 px-3 py-1 text-sm font-medium text-white">
+                  <UserRound className="h-3.5 w-3.5" /> Assigned to {caseData.assignedTo.name}
                 </span>
               )}
             </div>
@@ -244,6 +243,16 @@ export default function CaseDetailsPage() {
         <div className="grid gap-6 lg:grid-cols-3">
           {/* Main column */}
           <div className="space-y-6 lg:col-span-2">
+            {caseData.immediateSafetyConcern && (
+              <div role="note" className="flex items-start gap-3 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+                <AlertCircle className="mt-0.5 h-5 w-5 shrink-0" />
+                <div>
+                  <p className="font-semibold">Immediate safety concern reported</p>
+                  <p>The reporting teacher indicated that someone may be at risk. Review this case first.</p>
+                </div>
+              </div>
+            )}
+
             <Card>
               <CardHeader className="pb-4">
                 <CardTitle className="text-base">Case Information</CardTitle>
@@ -257,7 +266,10 @@ export default function CaseDetailsPage() {
                       <span className="ml-1 font-normal text-slate-500">· {caseData.student.studentId} · {caseData.student.classGrade}</span>
                     </Detail>
                   )}
-                  <Detail icon={CalendarDays} label="Incident Date">{fmt(caseData.incidentDate)}</Detail>
+                  <Detail icon={CalendarDays} label="Incident Date">
+                    {fmt(caseData.incidentDate)}
+                    {caseData.incidentTime && <span className="ml-1 font-normal text-slate-500">· {new Date(caseData.incidentTime).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</span>}
+                  </Detail>
                   <Detail icon={Clock} label="Reported On">{fmt(caseData.submittedAt)}</Detail>
                   {caseData.location && <Detail icon={MapPin} label="Location">{caseData.location}</Detail>}
                   {caseData.witnesses && <Detail icon={Users} label="Witnesses">{caseData.witnesses}</Detail>}
@@ -303,7 +315,11 @@ export default function CaseDetailsPage() {
                       </div>
                     </div>
                     <p className="mt-2 text-sm leading-relaxed text-slate-600">{action.rationale}</p>
-                    {action.responsibleUser?.name && <p className="mt-1 text-xs text-slate-400">Responsible: {action.responsibleUser.name}</p>}
+                    <p className="mt-1 text-xs text-slate-400">
+                      {action.responsibleUser?.name && <>Responsible: {action.responsibleUser.name}</>}
+                      {action.startDate && <> · From {fmt(action.startDate)}</>}
+                      {action.endDate && <> to {fmt(action.endDate)}</>}
+                    </p>
                   </div>
                 ))}
               </RecordSection>
@@ -325,6 +341,22 @@ export default function CaseDetailsPage() {
                       </div>
                     </div>
                     <p className="mt-2 text-sm leading-relaxed text-slate-600">{intervention.notes}</p>
+                    {(intervention.outcome || intervention.nextStep) && (
+                      <dl className="mt-3 grid gap-2 sm:grid-cols-2">
+                        {intervention.outcome && (
+                          <div className="rounded-lg bg-slate-50 px-3 py-2">
+                            <dt className="text-xs font-medium uppercase tracking-wider text-slate-400">Outcome</dt>
+                            <dd className="text-sm text-slate-700">{intervention.outcome}</dd>
+                          </div>
+                        )}
+                        {intervention.nextStep && (
+                          <div className="rounded-lg bg-slate-50 px-3 py-2">
+                            <dt className="text-xs font-medium uppercase tracking-wider text-slate-400">Next step</dt>
+                            <dd className="text-sm text-slate-700">{intervention.nextStep}</dd>
+                          </div>
+                        )}
+                      </dl>
+                    )}
                     {intervention.counsellor?.name && <p className="mt-1 text-xs text-slate-400">Counsellor: {intervention.counsellor.name}</p>}
                   </div>
                 ))}
@@ -339,10 +371,13 @@ export default function CaseDetailsPage() {
                       <p className="text-sm font-semibold text-slate-900">Due {fmt(followUp.dueDate)}</p>
                       <div className="flex items-center gap-3">
                         {followUp.completionDate && <span className="text-xs text-slate-500">Completed {fmt(followUp.completionDate)}</span>}
-                        <StatusBadge status={followUp.status} />
+                        <StatusBadge status={followUp.status === 'PENDING' && new Date(followUp.dueDate) < new Date(new Date().toDateString()) ? 'OVERDUE' : followUp.status} />
                       </div>
                     </div>
                     {followUp.nextStep && <p className="mt-2 text-sm leading-relaxed text-slate-600">{followUp.nextStep}</p>}
+                    {followUp.result && (
+                      <p className="mt-2 rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700"><span className="font-semibold">Result: </span>{followUp.result}</p>
+                    )}
                     {followUp.assignedUser?.name && <p className="mt-1 text-xs text-slate-400">Assigned to {followUp.assignedUser.name}</p>}
                     {['PRINCIPAL', 'COUNSELLOR'].includes(user?.role || '') && ['PENDING', 'OVERDUE'].includes(followUp.status) && (
                       <div className="mt-3">

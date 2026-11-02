@@ -64,19 +64,18 @@ export function RecordDetail({ kind }: { kind: 'students' | 'users' }) {
           </div>
         ) : (
           <>
-            <section className="relative overflow-hidden rounded-3xl bg-ink-950 px-6 py-8 text-white shadow-[var(--shadow-lift)] sm:px-8">
-              <div aria-hidden className="absolute inset-0 bg-grid-ink [mask-image:radial-gradient(ellipse_at_top_right,black,transparent_70%)]" />
-              <div aria-hidden className="absolute -right-16 -top-24 h-64 w-64 rounded-full bg-emerald-500/20 blur-3xl" />
+            <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-6 py-8 text-white shadow-[var(--shadow-lift)] sm:px-8">
+              <div aria-hidden className="absolute inset-0 bg-grid-light [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center">
-                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-gold-300 to-gold-500 text-xl font-bold text-ink-950 shadow-lg">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white text-xl font-bold text-blue-700 shadow-lg">
                   {initials(data.name)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-300">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-100">
                     {kind === 'students' ? 'Student record' : 'Staff member'}
                   </p>
                   <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{data.name}</h1>
-                  <p className="mt-1 text-sm text-slate-400">
+                  <p className="mt-1 text-sm text-blue-100">
                     {kind === 'students' ? `${data.studentId} · Class ${data.classGrade}` : `${roleLabels[data.role] || data.role} · ${data.staffIdentifier}`}
                   </p>
                 </div>
@@ -116,7 +115,7 @@ export function RecordDetail({ kind }: { kind: 'students' | 'users' }) {
               {kind === 'students' && (
                 <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[var(--shadow-soft)] lg:col-span-2">
                   <div className="flex items-center gap-3 border-b border-slate-100 px-6 py-5">
-                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
                       <FolderOpen className="h-5 w-5" />
                     </span>
                     <div>

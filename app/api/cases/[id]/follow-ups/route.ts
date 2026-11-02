@@ -45,7 +45,9 @@ export async function POST(
 
     const { id } = await params
     const body = await request.json()
-    const { dueDate, assignedUserId, notes } = body
+    const { dueDate, assignedUserId } = body
+    // The planned activity is stored as the follow-up's next step; accept either field name.
+    const notes = typeof body.nextStep === 'string' ? body.nextStep : body.notes
     
     if (!dueDate || !assignedUserId) {
       return NextResponse.json(errorResponse('INVALID_INPUT', 'dueDate and assignedUserId are required'), { status: 400 })

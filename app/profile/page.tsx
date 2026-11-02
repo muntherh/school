@@ -16,14 +16,13 @@ export default function Profile() {
         </div>
 
         <section className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-[var(--shadow-soft)]">
-          <div className="relative h-28 overflow-hidden bg-ink-950">
-            <div aria-hidden className="absolute inset-0 bg-grid-ink" />
-            <div aria-hidden className="absolute -right-10 -top-20 h-56 w-56 rounded-full bg-emerald-500/25 blur-3xl" />
+          <div className="relative h-28 overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500">
+            <div aria-hidden className="absolute inset-0 bg-grid-light" />
           </div>
           <div className="px-6 pb-6">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex items-start gap-4">
-                <div className="relative -mt-10 flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-gold-300 to-gold-500 text-2xl font-bold text-ink-950 shadow-lg ring-4 ring-white">
+                <div className="relative -mt-10 flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-blue-100 text-2xl font-bold text-blue-700 shadow-lg ring-4 ring-white">
                   {initials(user?.name)}
                 </div>
                 <div className="pt-3">

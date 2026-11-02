@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { useAuth } from '@/hooks/use-auth'
 import { api } from '@/lib/api-client'
+import { useConfirm } from '@/components/confirm-dialog'
 import { Search, Filter, Plus, Shield, CheckCircle, Clock, XCircle } from 'lucide-react'
 
 export default function UsersPage() {
@@ -80,26 +81,48 @@ export default function UsersPage() {
     setFilters(prev => ({ ...prev, [key]: value }))
   }
 
+  const [confirm, confirmDialog] = useConfirm()
+  const [notice, setNotice] = useState<{ kind: 'ok' | 'error'; text: string } | null>(null)
+
   const handleStatusUpdate = async (userId: string, newStatus: string) => {
+    const target = users.find((u: any) => u.id === userId)
+    const name = target?.name || 'this account'
+    if (newStatus === 'DEACTIVATED' || newStatus === 'REJECTED') {
+      const ok = await confirm({
+        title: newStatus === 'DEACTIVATED' ? `Deactivate ${name}?` : `Reject ${name}?`,
+        description: newStatus === 'DEACTIVATED'
+          ? 'They are signed out immediately and cannot use the portal until reactivated. Their past records stay intact.'
+          : 'The account request is declined and they cannot sign in.',
+        confirmLabel: newStatus === 'DEACTIVATED' ? 'Deactivate' : 'Reject',
+        tone: 'danger',
+      })
+      if (!ok) return
+    }
     try {
       const response = await api.updateUserStatus(userId, newStatus)
       if (response.success) {
+        const verb: Record<string, string> = { ACTIVE: 'activated', DEACTIVATED: 'deactivated', REJECTED: 'rejected' }
+        setNotice({ kind: 'ok', text: `${name} ${verb[newStatus] || 'updated'}.` })
         loadUsers()
       }
-    } catch (error) {
-      console.error('Failed to update user status:', error)
+    } catch (error: any) {
+      setNotice({ kind: 'error', text: error?.message || 'The account could not be updated. Try again.' })
     }
   }
 
   return (
     <DashboardLayout>
+      {confirmDialog}
       <div className="space-y-8">
+        {notice && (
+          <p role="status" className={`rounded-xl px-4 py-3 text-sm ${notice.kind === 'ok' ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-700'}`}>{notice.text}</p>
+        )}
         <div className="flex items-center justify-between">
           <div>
             <h1 className="page-title">Staff Management</h1>
             <p className="text-slate-600 mt-1">Manage staff accounts and approvals</p>
           </div>
-          {currentUser?.role === 'PRINCIPAL' && <Button onClick={() => router.push('/users/new')} className="shadow-lg shadow-emerald-500/25">
+          {currentUser?.role === 'PRINCIPAL' && <Button onClick={() => router.push('/users/new')} className="shadow-lg shadow-blue-500/25">
             <Plus className="mr-2 h-4 w-4" />
             Add Staff
           </Button>}
@@ -173,7 +196,7 @@ export default function UsersPage() {
           <CardContent>
             {isLoading ? (
               <div className="flex items-center justify-center py-12">
-                <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-emerald-600" />
+                <div className="h-8 w-8 animate-spin rounded-full border-4 border-gray-300 border-t-blue-600" />
               </div>
             ) : users.length === 0 ? (
               <div className="text-center py-12">

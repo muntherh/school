@@ -174,11 +174,14 @@ export const caseFilterSchema = z.object({
   category: z.string().optional(),
   incidentDateFrom: z.string().optional(),
   incidentDateTo: z.string().optional(),
+  classGrade: z.string().trim().max(50).optional(),
+  sort: z.enum(['newest', 'oldest', 'incident_desc', 'incident_asc']).optional(),
   page: z.string().regex(/^[1-9]\d*$/).optional().default('1'),
   limit: z.string().regex(/^[1-9]\d*$/).refine(v => Number(v) <= 100).optional().default('20'),
 })
 
 export const studentFilterSchema = z.object({
+  query: z.string().trim().max(100).optional(),
   studentId: z.string().optional(),
   name: z.string().optional(),
   classGrade: z.string().optional(),

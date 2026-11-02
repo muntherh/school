@@ -1,5 +1,7 @@
 # Requirements Traceability Matrix (RTM)
 
+> This matrix is the original implementation plan. For the verified, current status of every SRS requirement see [srs-compliance-review.md](srs-compliance-review.md).
+
 ## 1. Functional Requirements Traceability
 
 ### 1.1 Authentication and Account Management (FR-AUTH)

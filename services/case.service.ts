@@ -23,6 +23,8 @@ export class CaseService {
     category?: string
     incidentDateFrom?: string
     incidentDateTo?: string
+    classGrade?: string
+    sort?: string
     page?: string
     limit?: string
   }) {
@@ -33,7 +35,13 @@ export class CaseService {
       const skip = (page - 1) * limit
 
       const where: any = {}
-      if (validatedFilters.search) where.OR = [{ referenceNumber: { contains: validatedFilters.search, mode: 'insensitive' } }, { description: { contains: validatedFilters.search, mode: 'insensitive' } }]
+      if (validatedFilters.search) where.OR = [
+        { referenceNumber: { contains: validatedFilters.search, mode: 'insensitive' } },
+        { description: { contains: validatedFilters.search, mode: 'insensitive' } },
+        { student: { name: { contains: validatedFilters.search, mode: 'insensitive' } } },
+        { student: { studentId: { contains: validatedFilters.search, mode: 'insensitive' } } },
+      ]
+      if (validatedFilters.classGrade) where.student = { classGrade: { equals: validatedFilters.classGrade, mode: 'insensitive' } }
       if (validatedFilters.assignedToId) where.assignedToId = validatedFilters.assignedToId
 
       if (validatedFilters.status) {
@@ -58,7 +66,10 @@ export class CaseService {
           where.incidentDate.gte = new Date(validatedFilters.incidentDateFrom)
         }
         if (validatedFilters.incidentDateTo) {
-          where.incidentDate.lte = new Date(validatedFilters.incidentDateTo)
+          // A plain date (YYYY-MM-DD) means "up to the end of that day".
+          const to = new Date(validatedFilters.incidentDateTo)
+          if (/^\d{4}-\d{2}-\d{2}$/.test(validatedFilters.incidentDateTo)) to.setUTCHours(23, 59, 59, 999)
+          where.incidentDate.lte = to
         }
       }
 
@@ -87,7 +98,12 @@ export class CaseService {
             status: true,
             submittedAt: true,
           },
-          orderBy: { submittedAt: 'desc' },
+          orderBy: {
+            newest: { submittedAt: 'desc' as const },
+            oldest: { submittedAt: 'asc' as const },
+            incident_desc: { incidentDate: 'desc' as const },
+            incident_asc: { incidentDate: 'asc' as const },
+          }[validatedFilters.sort ?? 'newest'],
           skip,
           take: limit,
         }),

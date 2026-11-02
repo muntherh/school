@@ -2,37 +2,48 @@
 
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
-import { DashboardLayout } from '@/components/layout/dashboard-layout'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Select } from '@/components/ui/select'
 import { Input } from '@/components/ui/input'
+import { FormShell, FormError, textareaClass } from '@/components/form-shell'
+import { useConfigList } from '@/hooks/use-config-list'
 import { api } from '@/lib/api-client'
-import { ArrowLeft, Save } from 'lucide-react'
+import { Save } from 'lucide-react'
 
 export default function InterventionPage() {
   const params = useParams()
   const router = useRouter()
+  const types = useConfigList('INTERVENTION_TYPES')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [formData, setFormData] = useState({
     type: '',
-    interventionDate: new Date().toISOString().split('T')[0],
+    date: new Date().toISOString().split('T')[0],
     notes: '',
+    confidentialityLevel: 'STANDARD',
+    outcome: '',
+    nextStep: '',
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+    if (formData.notes.trim().length < 10) {
+      setError('Session notes must be at least 10 characters.')
+      return
+    }
     setIsLoading(true)
-
     try {
-      const response = await api.createIntervention(params.id as string, { ...formData, date: formData.interventionDate })
-      if (response.success) {
-        router.push(`/cases/${params.id}`)
-      } else {
-        setError(response.error?.message || 'Failed to create intervention')
-      }
+      const response = await api.createIntervention(params.id as string, {
+        type: formData.type,
+        date: formData.date,
+        notes: formData.notes,
+        confidentialityLevel: formData.confidentialityLevel,
+        outcome: formData.outcome || undefined,
+        nextStep: formData.nextStep || undefined,
+      })
+      if (response.success) router.push(`/cases/${params.id}`)
+      else setError(response.error?.message || 'Failed to save the intervention')
     } catch (err: any) {
       setError(err.message || 'An error occurred')
     } finally {
@@ -40,94 +51,93 @@ export default function InterventionPage() {
     }
   }
 
-  const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }))
-  }
+  const handleChange = (field: string, value: string) => setFormData((prev) => ({ ...prev, [field]: value }))
 
   return (
-    <DashboardLayout>
-      <div className="space-y-8">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => router.push(`/cases/${params.id}`)}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back
-            </Button>
-            <div>
-              <h1 className="page-title">Counselling Intervention</h1>
-              <p className="text-slate-600 mt-1">Document counselling session or intervention</p>
-            </div>
+    <FormShell
+      backHref={`/cases/${params.id}`}
+      title="Counselling Intervention"
+      subtitle="Record a counselling session or support intervention for this case"
+      cardTitle="Intervention Details"
+    >
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Select
+            label="Intervention Type *"
+            value={formData.type}
+            onChange={(e) => handleChange('type', e.target.value)}
+            options={[{ value: '', label: 'Select type' }, ...types.map((t) => ({ value: t, label: t }))]}
+            required
+          />
+          <Input
+            label="Session Date *"
+            type="date"
+            value={formData.date}
+            onChange={(e) => handleChange('date', e.target.value)}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="intervention-notes" className="mb-1.5 block text-sm font-medium text-slate-700">Session Notes *</label>
+          <textarea
+            id="intervention-notes"
+            className={textareaClass}
+            placeholder="What was discussed or done, and what you observed."
+            maxLength={5000}
+            value={formData.notes}
+            onChange={(e) => handleChange('notes', e.target.value)}
+            required
+          />
+        </div>
+
+        <Select
+          label="Confidentiality *"
+          value={formData.confidentialityLevel}
+          onChange={(e) => handleChange('confidentialityLevel', e.target.value)}
+          options={[
+            { value: 'STANDARD', label: 'Standard: visible to the principal and assigned counsellor' },
+            { value: 'CONFIDENTIAL', label: 'Confidential: counselling content, handle with care' },
+            { value: 'RESTRICTED', label: 'Restricted: most sensitive, excluded from exports' },
+          ]}
+          required
+        />
+
+        <div className="grid gap-6 sm:grid-cols-2">
+          <div>
+            <label htmlFor="intervention-outcome" className="mb-1.5 block text-sm font-medium text-slate-700">Outcome / Progress</label>
+            <textarea
+              id="intervention-outcome"
+              className={textareaClass}
+              placeholder="Observed progress or result of the session (optional). This does not decide any sanction."
+              maxLength={2000}
+              value={formData.outcome}
+              onChange={(e) => handleChange('outcome', e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="intervention-next-step" className="mb-1.5 block text-sm font-medium text-slate-700">Next Step</label>
+            <textarea
+              id="intervention-next-step"
+              className={textareaClass}
+              placeholder="Planned next step, if any (optional)."
+              maxLength={2000}
+              value={formData.nextStep}
+              onChange={(e) => handleChange('nextStep', e.target.value)}
+            />
           </div>
         </div>
 
-        <Card className="border-slate-200 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold text-slate-800">Intervention Details</CardTitle>
-            <CardDescription className="text-slate-500">Record the counselling intervention details</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <Select
-                label="Intervention Type"
-                value={formData.type}
-                onChange={(e) => handleChange('type', e.target.value)}
-                options={[
-                  { value: '', label: 'Select type' },
-                  { value: 'Individual Counselling', label: 'Individual Counselling' },
-                  { value: 'Group Counselling', label: 'Group Counselling' },
-                  { value: 'Mediation', label: 'Mediation' },
-                  { value: 'Behavioral Intervention', label: 'Behavioral Intervention' },
-                  { value: 'Academic Support', label: 'Academic Support' },
-                  { value: 'Other', label: 'Other' },
-                ]}
-                required
-              />
+        <FormError message={error} />
 
-              <Input
-                label="Intervention Date"
-                type="date"
-                value={formData.interventionDate}
-                onChange={(e) => handleChange('interventionDate', e.target.value)}
-                required
-              />
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Intervention Notes *
-                </label>
-                <textarea
-                  className="flex min-h-[120px] w-full rounded-xl border border-input bg-white px-4 py-3 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 focus:outline-none"
-                  placeholder="Document the intervention details, observations, and outcomes..."
-                  value={formData.notes}
-                  onChange={(e) => handleChange('notes', e.target.value)}
-                  required
-                />
-              </div>
-
-              {error && (
-                <div className="p-3 text-sm text-red-600 bg-red-50 rounded-md border border-red-200">
-                  {error}
-                </div>
-              )}
-
-              <div className="flex justify-end space-x-3">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => router.push(`/cases/${params.id}`)}
-                  disabled={isLoading}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit" isLoading={isLoading} className="shadow-lg shadow-emerald-500/25">
-                  <Save className="mr-2 h-4 w-4" />
-                  Save Intervention
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
-      </div>
-    </DashboardLayout>
+        <div className="flex justify-end gap-3">
+          <Button type="button" variant="outline" onClick={() => router.push(`/cases/${params.id}`)} disabled={isLoading}>Cancel</Button>
+          <Button type="submit" isLoading={isLoading}>
+            {!isLoading && <Save className="h-4 w-4" />}
+            Save Intervention
+          </Button>
+        </div>
+      </form>
+    </FormShell>
   )
 }

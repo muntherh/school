@@ -18,6 +18,7 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url)
     const filters = {
+      query: searchParams.get('query') || undefined,
       studentId: searchParams.get('studentId') || undefined,
       name: searchParams.get('name') || undefined,
       classGrade: searchParams.get('classGrade') || undefined,

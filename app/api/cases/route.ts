@@ -4,6 +4,7 @@ import { CaseService } from '@/services/case.service'
 import { successResponse, errorResponse } from '@/lib/api-response'
 import { withAuth, authErrorResponse, permissionErrorResponse } from '@/lib/middleware'
 import { AuditService } from '@/services/audit.service'
+import { prisma } from '@/lib/prisma'
 
 // GET /api/cases - Get cases with filters
 export async function GET(request: NextRequest) {
@@ -26,6 +27,8 @@ export async function GET(request: NextRequest) {
       category: searchParams.get('category') || undefined,
       incidentDateFrom: searchParams.get('incidentDateFrom') || undefined,
       incidentDateTo: searchParams.get('incidentDateTo') || undefined,
+      classGrade: searchParams.get('classGrade') || undefined,
+      sort: searchParams.get('sort') || undefined,
       page: searchParams.get('page') || undefined,
       limit: searchParams.get('limit') || undefined,
     }
@@ -61,9 +64,25 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    
+    const { confirmDuplicate, ...caseInput } = body ?? {}
+
+    // FR-INC-06: detect a likely duplicate (same student, category and day) before saving.
+    // Only a count is returned so a teacher never learns about other staff members' reports.
+    let duplicates: { id: string; referenceNumber: string }[] = []
+    const incidentDate = new Date(caseInput.incidentDate)
+    if (typeof caseInput.studentId === 'string' && typeof caseInput.category === 'string' && !Number.isNaN(incidentDate.getTime())) {
+      const student = await prisma.student.findFirst({ where: { OR: [{ id: caseInput.studentId }, { studentId: caseInput.studentId }] }, select: { id: true } })
+      if (student) duplicates = await CaseService.checkForDuplicates(student.id, caseInput.category, incidentDate)
+    }
+    if (duplicates.length && confirmDuplicate !== true) {
+      return NextResponse.json(
+        errorResponse('DUPLICATE_SUSPECTED', `A similar report for this student and category already exists for this date (${duplicates.length}). Submit again to confirm it is a separate incident.`),
+        { status: 409 }
+      )
+    }
+
     const caseData = await CaseService.createCase({
-      ...body,
+      ...caseInput,
       reporterId: auth.user.id,
     })
 
@@ -81,6 +100,17 @@ export async function POST(request: NextRequest) {
       ipAddress: request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || undefined,
       userAgent: request.headers.get('user-agent') || undefined,
     })
+
+    if (duplicates.length) {
+      // Flag the confirmed submission so the principal sees it in the case history.
+      await AuditService.logEvent({
+        actorId: auth.user.id,
+        action: 'POSSIBLE_DUPLICATE_FLAGGED',
+        targetType: 'CASE',
+        targetId: caseData.id,
+        metadata: { similarCaseIds: duplicates.map(d => d.id) },
+      })
+    }
 
     return NextResponse.json(successResponse(caseData), { status: 201 })
   } catch (error: any) {

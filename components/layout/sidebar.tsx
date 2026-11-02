@@ -72,9 +72,8 @@ export function initials(name?: string) {
 
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <div className={cn('relative flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-400 via-emerald-500 to-teal-600 shadow-[0_8px_20px_-6px_rgb(16_185_129/0.6)] ring-1 ring-white/20', className)}>
+    <div className={cn('flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-700 shadow-[0_6px_16px_-6px_rgb(37_99_235/0.6)]', className)}>
       <ShieldCheck className="h-5 w-5 text-white" strokeWidth={2.25} />
-      <span className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-gold-400 ring-2 ring-ink-950" />
     </div>
   )
 }
@@ -90,19 +89,16 @@ export function Sidebar({ onNavigate, onClose }: { onNavigate?: () => void; onCl
   }
 
   return (
-    <aside className="relative flex h-full w-72 flex-col overflow-hidden bg-ink-950 text-slate-300">
-      {/* ambient glow */}
-      <div aria-hidden className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-emerald-500/15 blur-3xl" />
-      <div aria-hidden className="pointer-events-none absolute -bottom-32 -right-24 h-72 w-72 rounded-full bg-gold-500/10 blur-3xl" />
+    <aside className="relative flex h-full w-72 flex-col overflow-hidden border-r border-slate-200 bg-white text-slate-600">
 
       <div className="relative flex h-20 items-center gap-3 px-6">
         <BrandMark />
         <div className="leading-tight">
-          <p className="text-[15px] font-semibold tracking-tight text-white">SDMS</p>
-          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-slate-500">Student Conduct</p>
+          <p className="text-[15px] font-bold tracking-tight text-slate-900">SDMS</p>
+          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">School Discipline</p>
         </div>
         {onClose && (
-          <button onClick={onClose} aria-label="Close navigation" className="ml-auto rounded-lg p-2 text-slate-400 hover:bg-white/5 hover:text-white">
+          <button onClick={onClose} aria-label="Close navigation" className="ml-auto rounded-lg p-2 text-slate-400 hover:bg-slate-100 hover:text-slate-700">
             <X className="h-5 w-5" />
           </button>
         )}
@@ -114,7 +110,7 @@ export function Sidebar({ onNavigate, onClose }: { onNavigate?: () => void; onCl
           if (!items.length) return null
           return (
             <div key={section.title}>
-              <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">{section.title}</p>
+              <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-400">{section.title}</p>
               <ul className="space-y-1">
                 {items.map((item) => {
                   const isActive = item.match ? item.match(pathname) : pathname === item.href || pathname.startsWith(item.href + '/')
@@ -127,12 +123,12 @@ export function Sidebar({ onNavigate, onClose }: { onNavigate?: () => void; onCl
                         className={cn(
                           'group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200',
                           isActive
-                            ? 'bg-gradient-to-r from-white/[0.09] to-white/[0.03] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.06)] ring-1 ring-white/[0.07]'
-                            : 'text-slate-400 hover:bg-white/[0.04] hover:text-slate-100'
+                            ? 'bg-blue-50 text-blue-700'
+                            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                         )}
                       >
-                        {isActive && <span aria-hidden className="absolute -left-4 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-gradient-to-b from-emerald-300 to-emerald-500" />}
-                        <item.icon className={cn('h-[18px] w-[18px] transition-colors', isActive ? 'text-emerald-400' : 'text-slate-500 group-hover:text-slate-300')} />
+                        {isActive && <span aria-hidden className="absolute -left-4 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-blue-600" />}
+                        <item.icon className={cn('h-[18px] w-[18px] transition-colors', isActive ? 'text-blue-600' : 'text-slate-400 group-hover:text-slate-600')} />
                         {item.name}
                       </Link>
                     </li>
@@ -144,20 +140,20 @@ export function Sidebar({ onNavigate, onClose }: { onNavigate?: () => void; onCl
         })}
       </nav>
 
-      <div className="relative m-4 rounded-2xl border border-white/[0.06] bg-white/[0.03] p-3">
+      <div className="relative m-4 rounded-2xl border border-slate-200 bg-slate-50 p-3">
         <div className="flex items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold-300 to-gold-500 text-sm font-semibold text-ink-950">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-sm font-semibold text-blue-700">
             {initials(user?.name)}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-semibold text-white">{user?.name}</p>
+            <p className="truncate text-sm font-semibold text-slate-900">{user?.name}</p>
             <p className="truncate text-xs text-slate-500">{user ? roleLabels[user.role] || user.role : ''}</p>
           </div>
           <button
             onClick={handleLogout}
             aria-label="Sign Out"
             title="Sign out"
-            className="rounded-lg p-2 text-slate-500 transition-colors hover:bg-white/[0.06] hover:text-white"
+            className="rounded-lg p-2 text-slate-400 transition-colors hover:bg-white hover:text-red-600"
           >
             <LogOut className="h-[18px] w-[18px]" />
           </button>
