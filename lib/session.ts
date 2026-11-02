@@ -11,12 +11,19 @@ export interface SessionData {
   isLoggedIn?: boolean
 }
 
-if (process.env.NODE_ENV === 'production' && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32 || /^(replace-|default-secret)/i.test(process.env.SESSION_SECRET))) throw new Error('Set a random production SESSION_SECRET of at least 32 characters')
+// `next build` imports route modules to collect page data, but no request (and so no session)
+// is ever handled during the build. Only enforce the secret when the server actually runs, so a
+// deployment can be built before its runtime secrets are attached; the server still refuses to
+// start handling sessions without a strong SESSION_SECRET.
+const isBuildPhase = process.env.NEXT_PHASE === 'phase-production-build'
+
+if (process.env.NODE_ENV === 'production' && !isBuildPhase && (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32 || /^(replace-|default-secret)/i.test(process.env.SESSION_SECRET))) throw new Error('Set a random production SESSION_SECRET of at least 32 characters')
 
 const sessionTTL = Number(process.env.SESSION_MAX_AGE || '28800')
 if (!Number.isInteger(sessionTTL) || sessionTTL < 60 || sessionTTL > 86400) throw new Error('SESSION_MAX_AGE must be between 60 and 86400 seconds')
 export const sessionOptions = {
   password: process.env.SESSION_SECRET || (() => {
+    if (isBuildPhase) return 'build-phase-placeholder-never-used-for-requests'
     if (process.env.NODE_ENV === 'production') {
       throw new Error('SESSION_SECRET environment variable must be set in production')
     }

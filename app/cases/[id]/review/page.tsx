@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { DashboardLayout } from '@/components/layout/dashboard-layout'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -17,7 +17,15 @@ export default function CaseReviewPage() {
   const [formData, setFormData] = useState({
     result: '',
     notes: '',
+    assignedToId: '',
   })
+  const [staff, setStaff] = useState<{ id: string; name: string; role: string }[]>([])
+
+  useEffect(() => {
+    api.getAssignableUsers()
+      .then((r) => { if (r.success && Array.isArray(r.data)) setStaff(r.data as any[]) })
+      .catch(() => {})
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -25,7 +33,10 @@ export default function CaseReviewPage() {
     setIsLoading(true)
 
     try {
-      const response = await api.createCaseReview(params.id as string, formData)
+      // An assignee is only meaningful when the case is approved.
+      const { assignedToId, ...review } = formData
+      const payload = review.result === 'APPROVED' && assignedToId ? { ...review, assignedToId } : review
+      const response = await api.createCaseReview(params.id as string, payload)
       if (response.success) {
         router.push(`/cases/${params.id}`)
       } else {
@@ -78,11 +89,29 @@ export default function CaseReviewPage() {
                 required
               />
 
+              {formData.result === 'APPROVED' && (
+                <div className="space-y-1.5 animate-fade-in">
+                  <Select
+                    label="Assign To (optional)"
+                    value={formData.assignedToId}
+                    onChange={(e) => handleChange('assignedToId', e.target.value)}
+                    options={[
+                      { value: '', label: 'Decide later (case stays Action Pending)' },
+                      ...staff
+                        .filter((u) => ['COUNSELLOR', 'PRINCIPAL'].includes(u.role))
+                        .map((u) => ({ value: u.id, label: `${u.name} (${u.role.charAt(0) + u.role.slice(1).toLowerCase()})` })),
+                    ]}
+                  />
+                  <p className="text-xs text-slate-500">Choosing a counsellor assigns the case immediately so it appears on their dashboard.</p>
+                </div>
+              )}
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label htmlFor="review-notes" className="mb-1.5 block text-sm font-medium text-slate-700">
                   Review Notes *
                 </label>
                 <textarea
+                  id="review-notes"
                   className="flex min-h-[120px] w-full rounded-xl border border-input bg-white px-4 py-3 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 focus:outline-none"
                   placeholder="Provide detailed notes about your decision..."
                   value={formData.notes}

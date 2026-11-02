@@ -9,7 +9,6 @@ Use Node.js 22 or newer and PostgreSQL 16 or newer.
 ```sh
 git clone https://github.com/muntherh/school.git
 cd school
-git checkout codex/sdms-repair
 npm ci
 # Optional: start the local PostgreSQL service
 docker compose up -d db
@@ -24,6 +23,16 @@ npm run dev
 The seed is development-only and rejects NODE_ENV=production. Its users are fictional; inspect prisma/seed.js for the development credentials. Never seed an operational school database.
 
 SESSION_MAX_AGE is expressed in seconds (28800 = eight hours). Set NEXT_PUBLIC_APP_URL to the real HTTPS origin before building for deployment. Browser API requests use the same origin. SMTP and cloud storage are not needed for the implemented MVP.
+
+Prisma CLI settings live in `prisma.config.ts`, which loads `.env` for local commands (`migrate`, `db seed`, `studio`).
+
+## Screenshots
+
+Screenshots of every page (desktop and mobile), captured from a production build with fictional seed data, are in [`frontend-screenshots/`](frontend-screenshots/).
+
+## Deploying on Vercel
+
+The project builds without runtime secrets, but the running app refuses to handle sessions until they are set. In Vercel → Project Settings → Environment Variables, add `DATABASE_URL` (PostgreSQL), `SESSION_SECRET` (random, at least 32 characters) and `NEXT_PUBLIC_APP_URL` (the deployment's HTTPS origin), then redeploy. Run `npx prisma migrate deploy` against that database once before the first login.
 
 ## PostgreSQL migration
 
