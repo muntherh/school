@@ -50,9 +50,8 @@ export default function LoginPage() {
         <img src={school.campusImage} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover" />
         <div aria-hidden className="absolute inset-0 bg-gradient-to-br from-navy-950/95 via-navy-900/90 to-navy-800/70" />
         <Link href="/" className="relative flex items-center gap-3 self-start">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-gold-300 to-gold-500 text-navy-950 ring-2 ring-white/60">
-            <GraduationCap className="h-6 w-6" strokeWidth={1.8} />
-          </div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={school.logoWhite} alt={`${school.nameEn} logo`} width={512} height={512} className="h-12 w-12 object-contain" />
           <div className="leading-tight">
             <p className="font-serif text-lg font-bold">{school.nameShortEn}</p>
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-slate-300">International Private School</p>
