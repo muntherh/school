@@ -119,7 +119,7 @@ export default function HomePage() {
         <section className="relative overflow-hidden bg-navy-950 text-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={school.campusImage} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover object-center" />
-          <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-950/85 to-navy-900/30" />
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-navy-950/95 via-navy-950/75 to-navy-900/10" />
           <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-transparent to-transparent" />
           <div className="relative mx-auto max-w-7xl px-4 pb-36 pt-20 sm:px-6 lg:px-8 lg:pb-44 lg:pt-28">
             <div>
@@ -163,7 +163,7 @@ export default function HomePage() {
           <div className="relative pb-10">
             <div className="overflow-hidden rounded-2xl shadow-xl ring-1 ring-slate-200">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={school.campusImage} alt={`Outdoor play area at ${school.nameEn}`} width={1197} height={540} className="aspect-[4/3] h-full w-full object-cover" />
+              <img src={school.campusImage} alt={`Outdoor play area at ${school.nameEn}`} width={1989} height={791} className="aspect-[4/3] h-full w-full object-cover object-[60%_50%]" />
             </div>
             <div className="absolute -bottom-2 right-4 w-[min(85%,22rem)] rounded-xl bg-white p-3 shadow-2xl ring-1 ring-slate-200 sm:right-6">
               {/* eslint-disable-next-line @next/next/no-img-element */}
