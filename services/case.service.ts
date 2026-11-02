@@ -133,6 +133,13 @@ export class CaseService {
               email: true,
             },
           },
+          assignedTo: {
+            select: {
+              id: true,
+              name: true,
+              role: true,
+            },
+          },
           reviews: {
             include: {
               reviewer: {

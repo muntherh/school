@@ -59,7 +59,7 @@ export default function NewCasePage() {
               Back
             </Button>
             <div>
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Submit Incident Report</h1>
+              <h1 className="page-title">Submit Incident Report</h1>
               <p className="text-slate-600 mt-1">Create a new disciplinary case</p>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function NewCasePage() {
                   Description *
                 </label>
                 <textarea
-                  className="flex min-h-[120px] w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-sm placeholder:text-slate-400 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 focus:outline-none"
+                  className="flex min-h-[120px] w-full rounded-xl border border-input bg-white px-4 py-3 text-sm text-slate-900 shadow-[0_1px_2px_rgb(15_23_42/0.04)] transition-all placeholder:text-slate-400 hover:border-slate-300 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/15 focus:outline-none"
                   placeholder="Describe the incident in detail..."
                   value={formData.description}
                   onChange={(e) => handleChange('description', e.target.value)}

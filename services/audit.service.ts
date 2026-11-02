@@ -292,7 +292,19 @@ export class AuditService {
       }
 
       if (filters.targetType) {
-        where.targetType = filters.targetType
+        // Older events were written with mixed spellings ("Case" / "CASE", "FollowUp" / "FOLLOW_UP"),
+        // so match every known spelling of the requested target type.
+        const aliases: Record<string, string[]> = {
+          CASE: ['CASE', 'Case'],
+          USER: ['USER', 'User'],
+          STUDENT: ['STUDENT', 'Student'],
+          INTERVENTION: ['INTERVENTION', 'Intervention'],
+          DISCIPLINARY_ACTION: ['DISCIPLINARY_ACTION', 'DisciplinaryAction', 'ACTION'],
+          FOLLOW_UP: ['FOLLOW_UP', 'FollowUp'],
+          CASE_REVIEW: ['CASE_REVIEW', 'CaseReview'],
+          EXPORT: ['EXPORT', 'Export'],
+        }
+        where.targetType = { in: aliases[filters.targetType.toUpperCase()] ?? [filters.targetType] }
       }
 
       if (filters.targetId) {

@@ -62,7 +62,7 @@ export default function StudentsPage() {
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Students</h1>
+            <h1 className="page-title">Students</h1>
             <p className="text-slate-600 mt-1">Search and view student information</p>
           </div>
           {currentUser?.role === 'PRINCIPAL' && <Button onClick={() => router.push('/students/new')} className="shadow-lg shadow-emerald-500/25">

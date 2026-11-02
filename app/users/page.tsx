@@ -96,7 +96,7 @@ export default function UsersPage() {
       <div className="space-y-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">Staff Management</h1>
+            <h1 className="page-title">Staff Management</h1>
             <p className="text-slate-600 mt-1">Manage staff accounts and approvals</p>
           </div>
           {currentUser?.role === 'PRINCIPAL' && <Button onClick={() => router.push('/users/new')} className="shadow-lg shadow-emerald-500/25">

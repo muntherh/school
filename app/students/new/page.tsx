@@ -59,7 +59,7 @@ export default function NewStudentPage() {
             Back
           </Button>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            <h1 className="page-title">
               Add New Student
             </h1>
             <p className="text-slate-600 mt-1">Create a new student record</p>
