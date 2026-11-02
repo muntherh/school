@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
+import { humanize } from '@/components/status-badge'
 import { api } from '@/lib/api-client'
 import { Search, Filter, ChevronLeft, ChevronRight, ClipboardList } from 'lucide-react'
 
@@ -70,23 +71,16 @@ export default function AuditLogPage() {
   }
 
   const getActionBadge = (action: string) => {
-    const variants: Record<string, any> = {
-      CASE_CREATED: { variant: 'success', label: 'Case Created' },
-      CASE_UPDATED: { variant: 'info', label: 'Case Updated' },
-      CASE_STATUS_CHANGED: { variant: 'warning', label: 'Status Changed' },
-      USER_CREATED: { variant: 'success', label: 'User Created' },
-      USER_STATUS_CHANGED: { variant: 'warning', label: 'User Status Changed' },
-      STUDENT_CREATED: { variant: 'success', label: 'Student Created' },
-      STUDENT_UPDATED: { variant: 'info', label: 'Student Updated' },
-      INTERVENTION_CREATED: { variant: 'success', label: 'Intervention Created' },
-      ACTION_CREATED: { variant: 'success', label: 'Action Created' },
-      FOLLOW_UP_CREATED: { variant: 'success', label: 'Follow-up Created' },
-      FOLLOW_UP_COMPLETED: { variant: 'info', label: 'Follow-up Completed' },
-      LOGOUT: { variant: 'default', label: 'Logout' },
-      LOGIN: { variant: 'default', label: 'Login' },
-    }
-    const config = variants[action] || { variant: 'gray', label: action }
-    return <Badge variant={config.variant}>{config.label}</Badge>
+    const variant = /FAILED|DEACTIVATED|REJECTED/.test(action)
+      ? 'destructive'
+      : /LOGIN|LOGOUT/.test(action)
+        ? 'secondary'
+        : /CREATED|APPROVED|SUBMITTED|COMPLETED|REACTIVATED/.test(action)
+          ? 'success'
+          : /CLOSED|DECISION|STATUS|REOPENED|CLARIFICATION/.test(action)
+            ? 'warning'
+            : 'info'
+    return <Badge variant={variant as any}>{humanize(action)}</Badge>
   }
 
   return (
@@ -95,7 +89,7 @@ export default function AuditLogPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+            <h1 className="page-title">
               Audit Log
             </h1>
             <p className="text-muted-foreground mt-1">View system activity and security events</p>
@@ -120,15 +114,25 @@ export default function AuditLogPage() {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Actions</SelectItem>
+                    <SelectItem value="LOGIN_SUCCESS">Login Success</SelectItem>
+                    <SelectItem value="LOGIN_FAILED">Login Failed</SelectItem>
+                    <SelectItem value="LOGOUT">Logout</SelectItem>
                     <SelectItem value="CASE_CREATED">Case Created</SelectItem>
-                    <SelectItem value="CASE_UPDATED">Case Updated</SelectItem>
-                    <SelectItem value="CASE_STATUS_CHANGED">Status Changed</SelectItem>
-                    <SelectItem value="USER_CREATED">User Created</SelectItem>
-                    <SelectItem value="USER_STATUS_CHANGED">User Status Changed</SelectItem>
-                    <SelectItem value="STUDENT_CREATED">Student Created</SelectItem>
+                    <SelectItem value="CASE_DECISION_RECORDED">Case Decision Recorded</SelectItem>
+                    <SelectItem value="CASE_ASSIGNED">Case Assigned</SelectItem>
+                    <SelectItem value="CASE_STATUS_CHANGED">Case Status Changed</SelectItem>
+                    <SelectItem value="CASE_REOPENED">Case Reopened</SelectItem>
+                    <SelectItem value="CLARIFICATION_REQUESTED">Clarification Requested</SelectItem>
+                    <SelectItem value="CLARIFICATION_RESPONDED">Clarification Responded</SelectItem>
                     <SelectItem value="INTERVENTION_CREATED">Intervention Created</SelectItem>
-                    <SelectItem value="ACTION_CREATED">Action Created</SelectItem>
-                    <SelectItem value="FOLLOW_UP_CREATED">Follow-up Created</SelectItem>
+                    <SelectItem value="DISCIPLINARY_ACTION_CREATED">Disciplinary Action Created</SelectItem>
+                    <SelectItem value="FOLLOW_UP_ASSIGNED">Follow Up Assigned</SelectItem>
+                    <SelectItem value="FOLLOW_UP_COMPLETED">Follow Up Completed</SelectItem>
+                    <SelectItem value="USER_CREATED">User Created</SelectItem>
+                    <SelectItem value="USER_ACCOUNT_APPROVED">User Account Approved</SelectItem>
+                    <SelectItem value="USER_ACCOUNT_DEACTIVATED">User Account Deactivated</SelectItem>
+                    <SelectItem value="STUDENT_CREATED">Student Created</SelectItem>
+                    <SelectItem value="DATA_EXPORT">Data Export</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -144,11 +148,13 @@ export default function AuditLogPage() {
                   <SelectContent>
                     <SelectItem value="all">All Types</SelectItem>
                     <SelectItem value="CASE">Case</SelectItem>
+                    <SelectItem value="CASE_REVIEW">Case Review</SelectItem>
                     <SelectItem value="USER">User</SelectItem>
                     <SelectItem value="STUDENT">Student</SelectItem>
                     <SelectItem value="INTERVENTION">Intervention</SelectItem>
-                    <SelectItem value="ACTION">Action</SelectItem>
+                    <SelectItem value="DISCIPLINARY_ACTION">Disciplinary Action</SelectItem>
                     <SelectItem value="FOLLOW_UP">Follow-up</SelectItem>
+                    <SelectItem value="EXPORT">Export</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -195,29 +201,29 @@ export default function AuditLogPage() {
               </div>
             ) : (
               <>
-                <div className="rounded-lg border overflow-hidden">
+                <div className="overflow-hidden rounded-xl border border-slate-200">
                   <Table>
-                    <TableHeader className="bg-muted/50">
+                    <TableHeader className="bg-slate-50/80">
                       <TableRow>
-                        <TableHead className="font-semibold">Timestamp</TableHead>
-                        <TableHead className="font-semibold">Actor</TableHead>
-                        <TableHead className="font-semibold">Action</TableHead>
-                        <TableHead className="font-semibold">Target Type</TableHead>
-                        <TableHead className="font-semibold">Target ID</TableHead>
-                        <TableHead className="font-semibold">IP Address</TableHead>
+                        <TableHead>Timestamp</TableHead>
+                        <TableHead>Actor</TableHead>
+                        <TableHead>Action</TableHead>
+                        <TableHead>Target Type</TableHead>
+                        <TableHead>Target ID</TableHead>
+                        <TableHead>IP Address</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {auditEvents.map((event) => (
                         <TableRow key={event.id}>
-                          <TableCell className="text-sm">
-                            {new Date(event.timestamp).toLocaleString()}
+                          <TableCell className="whitespace-nowrap text-sm tabular-nums text-slate-500">
+                            {new Date(event.timestamp).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
                           </TableCell>
-                          <TableCell className="font-medium">{event.actorName || 'System'}</TableCell>
+                          <TableCell className="font-medium text-slate-900">{event.actor?.name || event.actorName || 'System'}</TableCell>
                           <TableCell>{getActionBadge(event.action)}</TableCell>
-                          <TableCell>{event.targetType}</TableCell>
-                          <TableCell className="text-sm font-mono">{event.targetId || '-'}</TableCell>
-                          <TableCell className="text-sm font-mono">{event.ipAddress || '-'}</TableCell>
+                          <TableCell className="text-xs font-medium uppercase tracking-wide text-slate-500">{event.targetType}</TableCell>
+                          <TableCell><span className="block max-w-[10rem] truncate font-mono text-xs text-slate-500" title={event.targetId || ''}>{event.targetId || '—'}</span></TableCell>
+                          <TableCell className="font-mono text-xs text-slate-500">{event.ipAddress || '—'}</TableCell>
                         </TableRow>
                       ))}
                     </TableBody>

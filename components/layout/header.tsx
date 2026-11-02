@@ -2,8 +2,6 @@
 
 import { useRouter } from 'next/navigation'
 import { useAuth } from '@/hooks/use-auth'
-import { Button } from '@/components/ui/button'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,30 +10,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { LogOut, User } from 'lucide-react'
+import { CalendarDays, ChevronDown, LogOut, Menu, UserRound } from 'lucide-react'
+import { initials, roleLabels } from './sidebar'
 
-export function Header() {
+function greeting() {
+  const h = new Date().getHours()
+  if (h < 12) return 'Good morning'
+  if (h < 18) return 'Good afternoon'
+  return 'Good evening'
+}
+
+export function Header({ onMenu }: { onMenu?: () => void }) {
   const router = useRouter()
   const { user, logout } = useAuth()
-
-  const getRoleLabel = (role: string) => {
-    const labels: Record<string, string> = {
-      PRINCIPAL: 'Principal',
-      TEACHER: 'Teacher',
-      COUNSELLOR: 'Counsellor',
-      ADMIN: 'Administrator',
-    }
-    return labels[role] || role
-  }
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
-  }
+  const today = new Date().toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
 
   const handleLogout = async () => {
     await logout()
@@ -43,43 +31,56 @@ export function Header() {
   }
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-slate-200 bg-white px-6">
-      <div>
-        <h2 className="text-lg font-semibold text-slate-900">
-          {user?.name || 'User'}
-        </h2>
-        <p className="text-sm text-slate-600">
-          {user && getRoleLabel(user.role)}
+    <header className="sticky top-0 z-30 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200/70 bg-white/75 px-4 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60 sm:px-6 lg:px-8">
+      <button
+        onClick={onMenu}
+        aria-label="Open navigation"
+        className="-ml-1 rounded-lg p-2 text-slate-600 hover:bg-slate-100 lg:hidden"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-semibold text-slate-900">
+          {greeting()}, {user?.name?.split(' ').slice(0, 2).join(' ') || 'there'}
+        </p>
+        <p className="hidden items-center gap-1.5 text-xs text-slate-500 sm:flex">
+          <CalendarDays className="h-3.5 w-3.5" />
+          {today}
         </p>
       </div>
-      <div className="flex items-center space-x-4">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-              <Avatar className="h-8 w-8">
-                <AvatarFallback>
-                  {user?.name ? getInitials(user.name) : 'U'}
-                </AvatarFallback>
-              </Avatar>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-56">
-            <DropdownMenuLabel>
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none text-slate-900">{user?.name}</p>
-                <p className="text-xs leading-none text-slate-600">
-                  {user?.email}
-                </p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Sign Out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+
+      {user && (
+        <span className="hidden rounded-full border border-emerald-200/70 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 md:inline-flex">
+          {roleLabels[user.role] || user.role}
+        </span>
+      )}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="flex items-center gap-2 rounded-full border border-slate-200 bg-white py-1 pl-1 pr-2.5 shadow-sm transition-colors hover:bg-slate-50" aria-label="Account menu">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-ink-700 to-ink-950 text-xs font-semibold text-white">
+              {initials(user?.name)}
+            </span>
+            <ChevronDown className="h-4 w-4 text-slate-400" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-60 rounded-xl p-1.5">
+          <DropdownMenuLabel className="px-2.5 py-2">
+            <p className="text-sm font-semibold text-slate-900">{user?.name}</p>
+            <p className="mt-0.5 truncate text-xs font-normal text-slate-500">{user?.email}</p>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={() => router.push('/profile')} className="rounded-lg px-2.5 py-2">
+            <UserRound className="mr-2 h-4 w-4" />
+            My profile
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleLogout} className="rounded-lg px-2.5 py-2 text-red-600 focus:bg-red-50 focus:text-red-700">
+            <LogOut className="mr-2 h-4 w-4" />
+            Sign Out
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </header>
   )
 }
