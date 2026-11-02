@@ -121,15 +121,17 @@ export default function HomePage() {
         {/* Hero */}
         <section className="relative overflow-hidden bg-navy-950 text-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={school.campusImage} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover object-center" />
-          <div aria-hidden className="absolute inset-0 bg-black/45" />
-          <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-          <div className="relative mx-auto flex max-w-4xl flex-col items-center px-4 pb-40 pt-24 text-center sm:px-6 lg:pb-48 lg:pt-32">
+          {/* Phones: show the whole entrance sign, then the text below it */}
+          <img src={school.entranceImage} alt={`Main entrance of ${school.nameEn}`} width={1981} height={793} className="block h-auto w-full sm:hidden" />
+          {/* Larger screens: full-bleed photo; keep the sign clear and darken only behind the text */}
+          <img src={school.entranceImage} alt="" aria-hidden className="absolute inset-0 hidden h-full w-full object-cover object-[50%_15%] sm:block" />
+          <div aria-hidden className="absolute inset-0 hidden bg-gradient-to-t from-black/85 via-black/45 to-transparent sm:block" />
+          <div className="relative mx-auto flex max-w-4xl flex-col items-center justify-end px-4 pb-28 pt-8 text-center sm:min-h-[700px] sm:px-6 sm:pb-32 sm:pt-72 lg:min-h-[760px] lg:pb-36">
             <p lang="ar" dir="rtl" className="font-arabic text-lg font-semibold text-white/90 sm:text-xl">{school.nameAr}</p>
-            <h1 className="mt-3 text-4xl font-extrabold leading-[1.1] tracking-tight drop-shadow-lg sm:text-6xl lg:text-7xl" style={{ textWrap: 'balance' }}>
+            <h1 className="mt-3 text-4xl font-extrabold leading-[1.1] tracking-tight drop-shadow-lg sm:text-6xl" style={{ textWrap: 'balance' }}>
               Welcome to {school.acronym}
             </h1>
-            <p className="mt-5 max-w-2xl text-lg font-semibold leading-relaxed text-white/95 drop-shadow sm:text-2xl">
+            <p className="mt-4 max-w-2xl text-lg font-semibold leading-relaxed text-white/95 drop-shadow sm:text-xl">
               The {school.portalName} helps our staff report incidents, review them fairly and support every student through counselling and follow-up.
             </p>
             <p className="mt-4 text-xs font-bold uppercase tracking-[0.18em] text-white/80">{school.curriculum}</p>
@@ -164,7 +166,7 @@ export default function HomePage() {
           <div className="relative pb-10">
             <div className="overflow-hidden rounded-2xl shadow-xl ring-1 ring-slate-200">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={school.entranceImage} alt={`Main entrance of ${school.nameEn}`} width={1981} height={793} className="aspect-[16/10] h-full w-full object-cover object-center" />
+              <img src={school.campusImage} alt={`Outdoor play area at ${school.nameEn}`} width={1989} height={791} className="aspect-[16/10] h-full w-full object-cover object-[60%_50%]" />
             </div>
             <div className="absolute -bottom-2 right-4 flex w-[min(88%,22rem)] items-center gap-3 rounded-xl bg-white p-4 shadow-2xl ring-1 ring-slate-200 sm:right-6">
               <Emblem className="h-12 w-12 shrink-0" />
