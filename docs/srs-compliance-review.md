@@ -93,7 +93,7 @@ Status key: ✅ implemented and verified · ⚠️ partially implemented (explai
 
 | Item | Status |
 |------|--------|
-| Clean blue-and-white interface, clear status badges, responsive tables | ✅ Navy-blue and white with a restrained gold accent for the school identity |
+| Clean blue-and-white interface, clear status badges, responsive tables | ⚠️ The internal system stays blue and white. At the school's request the public homepage, login page and accents follow the school's own website (fsisoman.edu.om): Nunito font, orange, pink-red, teal and green |
 | Public school homepage with staff login (school details in `lib/school.ts`) | ✅ |
 | Shared pages: login, unauthorized, pending approval, profile and logout | ✅ |
 | Loading states, empty states, error messages, confirmation dialogs | ✅ |

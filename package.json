@@ -3,9 +3,8 @@
   "version": "1.0.0",
   "license": "ISC",
   "dependencies": {
-    "@fontsource-variable/inter": "5.2.8",
     "@fontsource-variable/noto-kufi-arabic": "5.2.9",
-    "@fontsource-variable/playfair-display": "5.2.8",
+    "@fontsource-variable/nunito": "5.2.7",
     "@prisma/client": "^6.19.3",
     "@radix-ui/react-accordion": "^1.3.1",
     "@radix-ui/react-avatar": "^1.3.1",
@@ -53,6 +52,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && next build",
+    "vercel-build": "node scripts/vercel-build.js",
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
