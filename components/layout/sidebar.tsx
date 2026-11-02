@@ -73,9 +73,8 @@ export function initials(name?: string) {
 
 export function BrandMark({ className }: { className?: string }) {
   return (
-    <div className={cn('flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-gold-300 to-gold-500 text-navy-950 shadow-[0_6px_16px_-6px_rgb(180_134_25/0.6)] ring-2 ring-white', className)}>
-      <GraduationCap className="h-[55%] w-[55%]" strokeWidth={1.8} />
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={school.logo} alt={`${school.nameEn} logo`} width={512} height={512} className={cn('h-10 w-10 object-contain', className)} />
   )
 }
 

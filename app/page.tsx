@@ -66,11 +66,10 @@ function SectionTitle({ eyebrow, title, light = false }: { eyebrow: string; titl
   )
 }
 
-function Emblem({ className = '' }: { className?: string }) {
+function Emblem({ className = '', light = false }: { className?: string; light?: boolean }) {
   return (
-    <div className={`flex items-center justify-center rounded-full bg-gradient-to-br from-gold-300 to-gold-500 text-navy-950 shadow-md ring-2 ring-white/70 ${className}`}>
-      <GraduationCap className="h-[55%] w-[55%]" strokeWidth={1.8} />
-    </div>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src={light ? school.logoWhite : school.logo} alt={`${school.nameEn} logo`} width={512} height={512} className={`object-contain ${className}`} />
   )
 }
 
@@ -119,11 +118,12 @@ export default function HomePage() {
         <section className="relative overflow-hidden bg-navy-950 text-white">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={school.campusImage} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover object-center" />
-          <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-navy-950 via-navy-950/85 to-navy-900/30" />
+          <div aria-hidden className="absolute inset-0 bg-gradient-to-r from-navy-950/95 via-navy-950/75 to-navy-900/10" />
           <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-navy-950/70 via-transparent to-transparent" />
           <div className="relative mx-auto max-w-7xl px-4 pb-36 pt-20 sm:px-6 lg:px-8 lg:pb-44 lg:pt-28">
             <div>
               <p lang="ar" dir="rtl" className="inline-block font-arabic text-lg font-semibold text-gold-300 sm:text-xl">{school.nameAr}</p>
+              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">{school.curriculum}</p>
               <h1 className="mt-4 font-serif text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl" style={{ textWrap: 'balance' }}>
                 Guiding Conduct, <span className="text-gold-400">Building Futures</span>
               </h1>
@@ -163,12 +163,14 @@ export default function HomePage() {
           <div className="relative pb-10">
             <div className="overflow-hidden rounded-2xl shadow-xl ring-1 ring-slate-200">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={school.campusImage} alt={`Outdoor play area at ${school.nameEn}`} width={1197} height={540} className="aspect-[4/3] h-full w-full object-cover" />
+              <img src={school.entranceImage} alt={`Main entrance of ${school.nameEn}`} width={1981} height={793} className="aspect-[16/10] h-full w-full object-cover object-center" />
             </div>
-            <div className="absolute -bottom-2 right-4 w-[min(85%,22rem)] rounded-xl bg-white p-3 shadow-2xl ring-1 ring-slate-200 sm:right-6">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={school.signImage} alt={`${school.nameEn} entrance sign`} width={334} height={88} className="h-auto w-full rounded-md" />
-              <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-slate-500"><MapPin className="h-3.5 w-3.5 text-gold-600" /> {school.city}</p>
+            <div className="absolute -bottom-2 right-4 flex w-[min(88%,22rem)] items-center gap-3 rounded-xl bg-white p-4 shadow-2xl ring-1 ring-slate-200 sm:right-6">
+              <Emblem className="h-12 w-12 shrink-0" />
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-navy-900">{school.curriculum}</p>
+                <p className="mt-0.5 flex items-center gap-1.5 text-xs text-slate-500"><MapPin className="h-3.5 w-3.5 shrink-0 text-gold-600" /> {school.city} · {school.licence}</p>
+              </div>
             </div>
           </div>
           <div>
@@ -269,10 +271,11 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-3 lg:px-8">
           <div>
             <div className="flex items-center gap-3">
-              <Emblem className="h-12 w-12" />
+              <Emblem light className="h-12 w-12" />
               <p className="font-serif text-lg font-bold leading-tight text-white">{school.nameShortEn}<br /><span className="text-xs font-sans font-semibold uppercase tracking-[0.14em] text-slate-400">International Private School</span></p>
             </div>
             <p lang="ar" dir="rtl" className="mt-4 inline-block font-arabic text-sm text-gold-300">{school.nameAr}</p>
+            <p className="mt-3 text-sm text-slate-400">{school.curriculum}<br />{school.licence}</p>
           </div>
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-white">Quick links</p>
