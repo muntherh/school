@@ -217,11 +217,11 @@ export default function CaseDetailsPage() {
         </button>
 
         {/* Case header */}
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-6 py-7 text-white shadow-[var(--shadow-lift)] sm:px-8">
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy-900 via-navy-800 to-blue-700 px-6 py-7 text-white shadow-[var(--shadow-lift)] sm:px-8">
           <div aria-hidden className="absolute inset-0 bg-grid-light [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-100">Case file · {caseData.category}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-300">Case file · {caseData.category}</p>
               <h1 className="mt-2 break-all font-mono text-lg font-semibold tracking-tight text-white sm:text-xl">
                 {caseData.referenceNumber}
               </h1>

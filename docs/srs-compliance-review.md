@@ -93,7 +93,8 @@ Status key: ✅ implemented and verified · ⚠️ partially implemented (explai
 
 | Item | Status |
 |------|--------|
-| Clean blue-and-white interface, clear status badges, responsive tables | ✅ |
+| Clean blue-and-white interface, clear status badges, responsive tables | ✅ Navy-blue and white with a restrained gold accent for the school identity |
+| Public school homepage with staff login (school details in `lib/school.ts`) | ✅ |
 | Shared pages: login, unauthorized, pending approval, profile and logout | ✅ |
 | Loading states, empty states, error messages, confirmation dialogs | ✅ |
 | Charts and counts from real database queries | ✅ |

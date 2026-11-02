@@ -190,17 +190,17 @@ export function Dashboard() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-6 py-7 text-white shadow-[var(--shadow-lift)] sm:px-8">
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy-900 via-navy-800 to-blue-700 px-6 py-7 text-white shadow-[var(--shadow-lift)] sm:px-8">
           <div aria-hidden className="absolute inset-0 bg-grid-light [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
           <div className="relative flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-100">{roleLabels[role] || role} workspace</p>
-              <h1 className="mt-2 text-2xl font-bold tracking-tight sm:text-3xl">{roleLabels[role] || 'My'} Dashboard</h1>
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-300">{roleLabels[role] || role} workspace</p>
+              <h1 className="mt-2 font-serif text-2xl font-bold tracking-tight sm:text-3xl">{roleLabels[role] || 'My'} Dashboard</h1>
               <p className="mt-1.5 max-w-xl text-sm text-blue-100">{intro[role]}</p>
             </div>
             <div className="flex flex-wrap gap-2.5">
               {['TEACHER', 'PRINCIPAL'].includes(role) && (
-                <Link href="/cases/new" className="inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 text-sm font-semibold text-blue-700 shadow-sm transition hover:bg-blue-50">
+                <Link href="/cases/new" className="inline-flex items-center gap-2 rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-semibold text-navy-950 shadow-sm transition hover:bg-gold-300">
                   <Plus className="h-4 w-4" /> Submit incident
                 </Link>
               )}

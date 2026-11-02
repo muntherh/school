@@ -14,7 +14,7 @@ export default function PendingApprovalPage() {
   useEffect(() => {
     // If user is not pending, redirect them
     if (user && user.accountStatus !== 'PENDING') {
-      router.push('/')
+      router.push('/portal')
     }
   }, [user, router])
 

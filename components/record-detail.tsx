@@ -64,14 +64,14 @@ export function RecordDetail({ kind }: { kind: 'students' | 'users' }) {
           </div>
         ) : (
           <>
-            <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 via-blue-600 to-blue-500 px-6 py-8 text-white shadow-[var(--shadow-lift)] sm:px-8">
+            <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-navy-900 via-navy-800 to-blue-700 px-6 py-8 text-white shadow-[var(--shadow-lift)] sm:px-8">
               <div aria-hidden className="absolute inset-0 bg-grid-light [mask-image:linear-gradient(to_left,black,transparent_70%)]" />
               <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center">
                 <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-white text-xl font-bold text-blue-700 shadow-lg">
                   {initials(data.name)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-blue-100">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-gold-300">
                     {kind === 'students' ? 'Student record' : 'Staff member'}
                   </p>
                   <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{data.name}</h1>
