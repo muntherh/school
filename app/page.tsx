@@ -21,6 +21,7 @@ import {
 } from 'lucide-react'
 import { school } from '@/lib/school'
 import { CountUp, Reveal, Squiggle } from '@/components/home/motion'
+import { MobileMenu } from '@/components/home/mobile-menu'
 
 export const metadata = {
   title: `${school.nameEn} | ${school.portalName}`,
@@ -54,6 +55,21 @@ const commitments = [
   { icon: Gavel, title: 'People decide, not software', text: 'The system never assigns punishment automatically.' },
   { icon: LockKeyhole, title: 'Confidential counselling', text: 'Counselling notes are visible only to authorized staff.' },
   { icon: ScrollText, title: 'Every action is recorded', text: 'Decisions and changes keep their author and time in an audit trail.' },
+]
+
+const campus = [
+  { src: school.corridorImage, alt: 'Colourful school corridor with a play area', title: 'Colourful corridors', text: 'Cheerful, welcoming spaces between classrooms.', span: 'col-span-2 lg:row-span-2', position: 'object-center' },
+  { src: school.computerLabImage, alt: 'Computer lab with student workstations', title: 'Computer lab', text: 'A workstation for every student.', span: 'col-span-2', position: 'object-center' },
+  { src: school.officeImage, alt: 'School administration office', title: 'Administration', text: 'Where cases are reviewed with care.', span: '', position: 'object-[60%_50%]' },
+  { src: school.campusImage, alt: 'Shaded outdoor play area', title: 'Outdoor play', text: 'Shaded play areas for every age.', span: '', position: 'object-[60%_50%]' },
+]
+
+const sections: [string, string][] = [
+  ['#about', 'About'],
+  ['#campus', 'Campus'],
+  ['#process', 'How it works'],
+  ['#accreditation', 'Accreditation'],
+  ['#contact', 'Contact'],
 ]
 
 // The four colours of the school logo, used to tell items apart.
@@ -120,30 +136,30 @@ export default function HomePage() {
 
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-8">
-          <Link href="/" className="group flex min-w-0 items-center gap-3">
-            <Logo className="h-14 w-14 shrink-0 transition-transform duration-700 group-hover:rotate-[30deg] sm:h-16 sm:w-16" />
-            <div className="min-w-0 text-[15px] font-extrabold leading-tight text-navy-950 sm:text-lg">
-              <p className="truncate">{school.nameShortEn}</p>
-              <p className="truncate">International Private School</p>
+        <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-2 px-4 py-2.5 sm:gap-4 sm:px-6 sm:py-3 lg:px-8">
+          <Link href="/" className="group flex min-w-0 items-center gap-2.5 sm:gap-3">
+            <Logo className="h-11 w-11 shrink-0 transition-transform duration-700 group-hover:rotate-[30deg] sm:h-16 sm:w-16" />
+            <div className="min-w-0 text-[13px] font-extrabold leading-[1.15] text-navy-950 sm:text-lg">
+              <p>{school.nameShortEn}</p>
+              <p className="text-[11px] font-bold text-slate-500 sm:text-lg sm:font-extrabold sm:text-navy-950">International Private School</p>
             </div>
           </Link>
           <nav className="hidden items-center gap-1 text-[16px] font-bold text-navy-950 lg:flex" aria-label="Main">
             <a href="#top" className="rounded-md bg-brand-pink px-3 py-1.5 text-white">Home</a>
-            {[
-              ['#about', 'About'],
-              ['#process', 'How it works'],
-              ['#accreditation', 'Accreditation'],
-              ['#contact', 'Contact'],
-            ].map(([href, label]) => (
+            {sections.map(([href, label]) => (
               <a key={href} href={href} className="relative rounded-md px-3 py-1.5 transition-colors after:absolute after:inset-x-3 after:-bottom-0.5 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-brand-pink after:transition-transform after:duration-300 hover:text-brand-pink hover:after:scale-x-100">
                 {label}
               </a>
             ))}
           </nav>
-          <Link href="/login" className="group inline-flex shrink-0 items-center gap-2 rounded-md bg-brand-pink px-4 py-2 text-[15px] font-bold text-white shadow-md shadow-brand-pink/30 transition hover:-translate-y-0.5 hover:bg-brand-pink-dark">
-            Staff Login <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-          </Link>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link href="/login" className="group inline-flex items-center gap-1.5 rounded-lg bg-brand-pink px-3 py-2 text-sm font-bold text-white shadow-md shadow-brand-pink/30 transition hover:-translate-y-0.5 hover:bg-brand-pink-dark sm:gap-2 sm:rounded-md sm:px-4 sm:text-[15px]">
+              <span className="sm:hidden">Login</span>
+              <span className="hidden sm:inline">Staff Login</span>
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </Link>
+            <MobileMenu links={sections} />
+          </div>
         </div>
       </header>
 
@@ -160,20 +176,20 @@ export default function HomePage() {
           </div>
           <div aria-hidden className="absolute inset-0 hidden bg-gradient-to-t from-black/85 via-black/40 to-transparent sm:block" />
 
-          <div className="relative mx-auto flex max-w-4xl flex-col items-center justify-end px-4 pb-36 pt-8 text-center sm:min-h-[720px] sm:px-6 sm:pb-40 sm:pt-72 lg:min-h-[780px] lg:pb-44">
+          <div className="relative mx-auto flex max-w-4xl flex-col items-center justify-end px-5 pb-28 pt-7 text-center sm:min-h-[720px] sm:px-6 sm:pb-40 sm:pt-72 lg:min-h-[780px] lg:pb-44">
             <p lang="ar" dir="rtl" className="hero-rise font-arabic text-lg font-semibold text-white/90 sm:text-xl" style={{ animationDelay: '150ms' }}>{school.nameAr}</p>
-            <h1 className="hero-rise mt-3 text-4xl font-extrabold leading-[1.1] tracking-tight drop-shadow-lg sm:text-6xl" style={{ animationDelay: '300ms', textWrap: 'balance' }}>
+            <h1 className="hero-rise mt-2 text-[2.5rem] font-extrabold leading-[1.1] tracking-tight drop-shadow-lg sm:text-6xl" style={{ animationDelay: '300ms', textWrap: 'balance' }}>
               Welcome to <span className="text-brand-orange">{school.acronym}</span>
             </h1>
-            <p className="hero-rise mt-4 max-w-2xl text-lg font-semibold leading-relaxed text-white/95 drop-shadow sm:text-xl" style={{ animationDelay: '450ms' }}>
+            <p className="hero-rise mt-3 max-w-2xl text-[15px] font-semibold leading-relaxed text-white/90 drop-shadow sm:mt-4 sm:text-xl" style={{ animationDelay: '450ms' }}>
               The {school.portalName} helps our staff report incidents, review them fairly and support every student through counselling and follow-up.
             </p>
             <p className="hero-rise mt-4 text-xs font-bold uppercase tracking-[0.18em] text-white/80" style={{ animationDelay: '600ms' }}>{school.curriculum}</p>
-            <div className="hero-rise mt-8 flex flex-wrap justify-center gap-3" style={{ animationDelay: '750ms' }}>
-              <Link href="/login" className="group inline-flex items-center gap-2 rounded-full bg-brand-orange px-7 py-3.5 text-base font-extrabold text-white shadow-xl shadow-black/30 transition hover:-translate-y-0.5 hover:bg-gold-500">
+            <div className="hero-rise mt-6 flex w-full flex-col gap-3 sm:mt-8 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-center" style={{ animationDelay: '750ms' }}>
+              <Link href="/login" className="group inline-flex items-center justify-center gap-2 rounded-full bg-brand-orange px-7 py-3.5 text-base font-extrabold text-white shadow-xl shadow-black/30 transition hover:-translate-y-0.5 hover:bg-gold-500">
                 Staff Login <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               </Link>
-              <a href="#process" className="inline-flex items-center gap-2 rounded-full border-2 border-white/80 px-7 py-3.5 text-base font-extrabold text-white backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/10">
+              <a href="#process" className="inline-flex items-center justify-center gap-2 rounded-full border-2 border-white/80 px-7 py-3.5 text-base font-extrabold text-white backdrop-blur-sm transition hover:-translate-y-0.5 hover:bg-white/10">
                 How it works
               </a>
             </div>
@@ -201,7 +217,7 @@ export default function HomePage() {
         </div>
 
         {/* Welcome */}
-        <section id="about" className="relative mx-auto grid max-w-7xl scroll-mt-24 items-center gap-14 px-4 py-24 sm:px-6 lg:grid-cols-2 lg:px-8">
+        <section id="about" className="relative mx-auto grid max-w-7xl scroll-mt-24 items-center gap-14 px-4 py-16 sm:py-24 sm:px-6 lg:grid-cols-2 lg:px-8">
           <Reveal variant="left">
             <SectionTitle eyebrow="Welcome to" title={`${school.acronym} ${school.portalName}`} />
             <p className="mt-6 text-lg font-bold text-navy-950">“{school.motto}”</p>
@@ -233,7 +249,7 @@ export default function HomePage() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={school.campusImage} alt={`Outdoor play area at ${school.nameEn}`} width={1989} height={791} className="aspect-[4/3] w-full object-cover object-[60%_50%] transition-transform duration-700 hover:scale-105" />
             </div>
-            <div className="float-b absolute -bottom-6 right-6 flex items-center gap-3 rounded-2xl bg-white p-4 shadow-2xl ring-1 ring-slate-100">
+            <div className="float-b absolute -bottom-6 right-3 flex items-center gap-3 rounded-2xl bg-white p-3 shadow-2xl ring-1 ring-slate-100 sm:right-6 sm:p-4">
               <Logo className="h-11 w-11 shrink-0" />
               <div>
                 <p className="text-sm font-extrabold text-navy-950">{school.curriculum}</p>
@@ -248,16 +264,16 @@ export default function HomePage() {
           <Wave fill="#0b1022" back="#20b0c0" />
           <div className="relative bg-navy-950 py-20">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={school.campusImage} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-25" />
+            <img src={school.computerLabImage} alt="" aria-hidden className="absolute inset-0 h-full w-full object-cover opacity-30" />
             <div aria-hidden className="absolute inset-0 bg-gradient-to-br from-brand-teal/40 via-navy-950/70 to-navy-950" />
             <div className="relative mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
               <SectionTitle eyebrow="Our community" title="A diverse, caring school family" light center />
-              <div className="mt-12 grid gap-5 sm:grid-cols-3">
+              <div className="mt-8 grid grid-cols-3 gap-2.5 sm:mt-12 sm:gap-5">
                 {school.stats.map((st, i) => (
                   <Reveal key={st.label} delay={i * 150} variant="zoom">
-                    <div className="group rounded-2xl bg-brand-teal/90 p-8 text-center text-white shadow-xl shadow-black/30 ring-1 ring-white/20 backdrop-blur transition duration-300 hover:-translate-y-1.5 hover:bg-brand-teal">
-                      <p className="text-6xl font-extrabold tracking-tight drop-shadow"><CountUp to={st.value} /></p>
-                      <p className="mt-2 text-lg font-bold text-white/95">{st.label}</p>
+                    <div className="group rounded-2xl bg-brand-teal/90 px-2 py-5 text-center sm:p-8 text-white shadow-xl shadow-black/30 ring-1 ring-white/20 backdrop-blur transition duration-300 hover:-translate-y-1.5 hover:bg-brand-teal">
+                      <p className="text-4xl font-extrabold tracking-tight drop-shadow sm:text-6xl"><CountUp to={st.value} /></p>
+                      <p className="mt-1 text-xs font-bold leading-tight text-white/95 sm:mt-2 sm:text-lg">{st.label}</p>
                     </div>
                   </Reveal>
                 ))}
@@ -267,11 +283,32 @@ export default function HomePage() {
           <Wave fill="#0b1022" back="#20b0c0" flip />
         </section>
 
+        {/* Campus gallery */}
+        <section id="campus" className="scroll-mt-24 py-16 sm:py-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <Reveal><SectionTitle eyebrow="Our campus" title="Bright spaces to learn and grow" center /></Reveal>
+            <div className="mt-8 grid grid-cols-2 gap-3 sm:mt-12 sm:gap-4 lg:h-[560px] lg:grid-cols-4 lg:grid-rows-2">
+              {campus.map((c, i) => (
+                <Reveal key={c.title} delay={i * 120} variant="zoom" className={`group relative overflow-hidden rounded-3xl shadow-lg ${c.span}`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={c.src} alt={c.alt} loading="lazy" className={`h-full min-h-[180px] w-full object-cover sm:min-h-[240px] transition-transform duration-[1200ms] ease-out group-hover:scale-110 ${c.position}`} />
+                  <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/10 to-transparent opacity-90 transition-opacity duration-500 group-hover:opacity-100" />
+                  <div className="absolute inset-x-0 bottom-0 p-4 text-white sm:p-5 transition-transform duration-500 group-hover:-translate-y-1">
+                    <span className={`mb-2 inline-block h-1.5 w-10 rounded-full ${brandBg[i % brandBg.length]} transition-all duration-500 group-hover:w-16`} />
+                    <p className="text-base font-extrabold sm:text-xl">{c.title}</p>
+                    <p className={`mt-0.5 max-w-sm text-sm text-white/85 ${c.span ? '' : 'hidden sm:block'}`}>{c.text}</p>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
         {/* Process */}
-        <section id="process" className="scroll-mt-24 py-24">
+        <section id="process" className="scroll-mt-24 py-16 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <Reveal><SectionTitle eyebrow="How it works" title="From report to resolution" center /></Reveal>
-            <ol className="relative mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <ol className="relative mt-12 sm:mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               <span aria-hidden className="absolute left-[12%] right-[12%] top-8 hidden border-t-2 border-dashed border-slate-300 lg:block" />
               {steps.map((s, i) => (
                 <Reveal as="li" key={s.title} delay={i * 140} className="relative">
@@ -290,18 +327,18 @@ export default function HomePage() {
         </section>
 
         {/* Roles */}
-        <section className="bg-slate-50 py-24">
+        <section className="bg-slate-50 py-16 sm:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <Reveal><SectionTitle eyebrow="Who uses the portal" title="One system, the right access for each role" /></Reveal>
-            <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-8 sm:mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {roles.map((r, i) => (
-                <Reveal as="article" key={r.title} delay={i * 120} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1.5 hover:shadow-xl">
-                  <div className={`relative flex h-32 items-center justify-center overflow-hidden ${brandBg[i % brandBg.length]}`}>
+                <Reveal as="article" key={r.title} delay={i * 120} className="group flex overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1.5 hover:shadow-xl sm:block">
+                  <div className={`relative flex w-20 shrink-0 items-center justify-center overflow-hidden sm:h-32 sm:w-auto ${brandBg[i % brandBg.length]}`}>
                     <span aria-hidden className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-white/15 transition-transform duration-700 group-hover:scale-150" />
                     <span aria-hidden className="absolute -bottom-10 -left-6 h-24 w-24 rounded-full bg-black/5" />
-                    <r.icon className="relative h-12 w-12 text-white transition-transform duration-500 group-hover:scale-110" strokeWidth={1.4} />
+                    <r.icon className="relative h-8 w-8 text-white transition-transform duration-500 group-hover:scale-110 sm:h-12 sm:w-12" strokeWidth={1.5} />
                   </div>
-                  <div className="p-5">
+                  <div className="p-4 sm:p-5">
                     <h3 className="text-lg font-extrabold text-navy-950">{r.title}</h3>
                     <p className="mt-1.5 text-sm leading-relaxed text-slate-500">{r.text}</p>
                   </div>
@@ -319,15 +356,17 @@ export default function HomePage() {
             <div aria-hidden className="float-b absolute -right-10 bottom-0 h-72 w-72 rounded-full bg-brand-orange/25" />
             <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <Reveal><SectionTitle eyebrow="Our commitments" title="Fairness and care in every case" light center /></Reveal>
-              <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="mt-8 sm:mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
                 {commitments.map((c, i) => (
                   <Reveal key={c.title} delay={i * 120} variant="up">
-                    <div className="h-full rounded-2xl bg-white/12 p-6 ring-1 ring-white/25 backdrop-blur transition duration-300 hover:-translate-y-1 hover:bg-white/20">
-                      <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-brand-pink shadow-md">
+                    <div className="flex h-full gap-4 rounded-2xl bg-white/12 p-4 ring-1 ring-white/25 backdrop-blur transition duration-300 hover:-translate-y-1 hover:bg-white/20 sm:block sm:p-6">
+                      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-white text-brand-pink shadow-md sm:h-12 sm:w-12">
                         <c.icon className="h-6 w-6" strokeWidth={1.8} />
                       </span>
-                      <h3 className="mt-4 text-lg font-extrabold">{c.title}</h3>
-                      <p className="mt-2 text-sm leading-relaxed text-white/90">{c.text}</p>
+                      <div>
+                        <h3 className="text-base font-extrabold sm:mt-4 sm:text-lg">{c.title}</h3>
+                        <p className="mt-1 text-sm leading-relaxed text-white/90 sm:mt-2">{c.text}</p>
+                      </div>
                     </div>
                   </Reveal>
                 ))}
@@ -338,7 +377,7 @@ export default function HomePage() {
         </section>
 
         {/* Accreditation */}
-        <section id="accreditation" className="scroll-mt-24 py-24">
+        <section id="accreditation" className="scroll-mt-24 py-16 sm:py-24">
           <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
             <Reveal><SectionTitle eyebrow="Accreditation" title="Recognised and accredited" center /></Reveal>
             <Reveal delay={100}>
@@ -346,13 +385,13 @@ export default function HomePage() {
                 Proud partners of Cambridge International, the Ministry of Education in Oman and a member of ECIS.
               </p>
             </Reveal>
-            <div className="mt-12 grid gap-6 sm:grid-cols-3">
+            <div className="mt-8 grid grid-cols-3 gap-2.5 sm:mt-12 sm:gap-6">
               {school.accreditation.map((a, i) => (
                 <Reveal key={a.name} delay={i * 140} variant="zoom">
-                  <div className="logo-card flex h-40 flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
+                  <div className="logo-card flex h-24 flex-col items-center justify-center gap-3 rounded-2xl border border-slate-200 bg-white p-3 sm:h-40 sm:p-6 shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={a.logo} alt={a.name} className="max-h-20 w-auto max-w-full object-contain" />
-                    <p className="text-xs font-bold uppercase tracking-wider text-slate-400">{a.name}</p>
+                    <img src={a.logo} alt={a.name} className="max-h-14 w-auto max-w-full object-contain sm:max-h-20" />
+                    <p className="hidden text-center text-xs font-bold uppercase tracking-wider text-slate-400 sm:block">{a.name}</p>
                   </div>
                 </Reveal>
               ))}
