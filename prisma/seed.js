@@ -16,13 +16,15 @@ async function main() {
   console.log('Environment:', process.env.NODE_ENV)
   console.log('WARNING: This will create fictional test data only suitable for development.')
 
-  // Hash passwords
-  const passwordHash = await bcrypt.hash('password123', 10)
+  // Hash passwords. All seeded demo accounts share this password.
+  // Demo login: principal@school.edu / password@123
+  const passwordHash = await bcrypt.hash('password@123', 10)
 
   // Create users
   const principal = await prisma.user.upsert({
     where: { email: 'principal@school.edu' },
-    update: {},
+    // Refresh the password on re-seed so the demo login stays principal@school.edu / password@123.
+    update: { passwordHash, accountStatus: 'ACTIVE' },
     create: {
       name: 'Dr. Jane Smith',
       staffIdentifier: 'PRINCIPAL001',

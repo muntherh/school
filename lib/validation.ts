@@ -28,6 +28,15 @@ export const createUserSchema = z.object({
   role: RoleEnum,
 })
 
+// Public self-registration. Role is intentionally NOT accepted from the client;
+// every self-registered account is created as a PENDING TEACHER and must be
+// approved by a Principal before it can sign in.
+export const registerSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(255),
+  email: z.string().email('Invalid email address'),
+  password: z.string().min(8, 'Password must be at least 8 characters').max(128),
+})
+
 export const updateUserSchema = z.object({
   name: z.string().min(1).max(255).optional(),
   email: z.string().email().optional(),

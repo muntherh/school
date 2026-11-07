@@ -148,6 +148,13 @@ export default function LoginPage() {
             </Button>
           </form>
 
+          <p className="mt-6 text-center text-sm text-slate-600">
+            Don&apos;t have an account?{' '}
+            <Link href="/register" className="font-semibold text-blue-700 transition-colors hover:text-blue-800 hover:underline">
+              Request access
+            </Link>
+          </p>
+
           <div className="mt-8 flex items-center justify-center gap-2 border-t border-slate-100 pt-6 text-xs text-slate-500">
             <Shield className="h-3.5 w-3.5" />
             <span>Secure login powered by your school network</span>
