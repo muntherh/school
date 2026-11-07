@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
+import { randomUUID } from 'crypto'
 import { prisma } from '@/lib/prisma'
-import { loginSchema, createUserSchema } from '@/lib/validation'
+import { loginSchema, createUserSchema, registerSchema } from '@/lib/validation'
 
 export interface AuthResult {
   success: boolean
@@ -81,6 +82,45 @@ export class AuthService {
       console.error('Login error:', error)
       return { success: false, error: 'Authentication failed' }
     }
+  }
+
+  /**
+   * Public self-registration. Always creates a PENDING TEACHER that a Principal
+   * must approve. The role is never taken from the caller, and a unique staff
+   * identifier is generated automatically.
+   */
+  static async register(data: { name: string; email: string; password: string }) {
+    const validated = registerSchema.parse(data)
+    const email = validated.email.trim().toLowerCase()
+
+    const existingUser = await prisma.user.findUnique({ where: { email } })
+    if (existingUser) {
+      throw new Error('An account with this email already exists')
+    }
+
+    const passwordHash = await this.hashPassword(validated.password)
+    const staffIdentifier = `SELF-${randomUUID().slice(0, 8).toUpperCase()}`
+
+    const user = await prisma.user.create({
+      data: {
+        name: validated.name.trim(),
+        staffIdentifier,
+        email,
+        passwordHash,
+        role: 'TEACHER',
+        accountStatus: 'PENDING',
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        accountStatus: true,
+        createdAt: true,
+      },
+    })
+
+    return user
   }
 
   /**

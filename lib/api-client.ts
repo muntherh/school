@@ -43,7 +43,28 @@ async function request<T>(
     credentials: 'include', // Include cookies for session
   })
 
-  const data = await response.json()
+  // Read the body as text first so an empty or non-JSON response (e.g. a crashed
+  // or misconfigured backend) produces a clear error instead of the cryptic
+  // "Unexpected end of JSON input" that `response.json()` throws on an empty body.
+  const raw = await response.text()
+  let data: any = {}
+  if (raw) {
+    try {
+      data = JSON.parse(raw)
+    } catch {
+      throw new ApiError(
+        'INVALID_RESPONSE',
+        `The server returned an unexpected response (HTTP ${response.status}). The backend may be misconfigured or unreachable — check that the database and SESSION_SECRET are set.`,
+        response.status
+      )
+    }
+  } else if (!response.ok) {
+    throw new ApiError(
+      'SERVER_ERROR',
+      `Server error (HTTP ${response.status}) with no response body. The backend may be unreachable or missing its database/SESSION_SECRET configuration.`,
+      response.status
+    )
+  }
 
   if (!response.ok) {
     throw new ApiError(
@@ -63,6 +84,12 @@ export const api = {
     request('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
+    }),
+
+  register: (data: { name: string; email: string; password: string }) =>
+    request('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
     }),
 
   logout: () =>
